@@ -1,6 +1,34 @@
+/*****************************************************************************
+LIVING INCOME CALCULATIONS AND OUTPUTS
+
+This stata do-file produces density plots as fractions about the distribution
+of underlying variables for the indication of the household income.
+
+
+It assumes variables have already been calculated. 
+If note, please check do-files:
+
+
+
+---------------------------------------------------------------------------
+
+This opensource file was created and is maintained by Marcelo Tyszler
+(m.tyszler@kit.nl), from KIT Royal Tropical Institute, Amsterdam.
+
+This project was jointly done with COSA, and it was supported by
+ISEAL, Living Income Community of Practice and GIZ
+
+-----------------------------------------------------------------------------
+Last Update:
+31/10/2019
+
+*****************************************************************************/
+
+
  use data_cleaned_LI, replace
 
- local var_list = "revenue_total_2018 revenue_usdha_2018 cocoa_land_used_ha cocoa_land_used_morethan5_ha prod_total_last_kg_ha prod_total_last_kg li_costs_usdhh_2018 li_inputs_usdhh_2018 li_hired_usdhh_2018 li_costs_usdha_2018 li_inputs_usdha_2018 li_hired_usdha_2018 total_hh_income_2018 total_income_2018"
+ local var_list = "revenue_total_2018 revenue_usdha_2018"
+ cocoa_land_used_ha cocoa_land_used_morethan5_ha prod_total_last_kg_ha prod_total_last_kg li_costs_usdhh_2018 li_inputs_usdhh_2018 li_hired_usdhh_2018 li_costs_usdha_2018 li_inputs_usdha_2018 li_hired_usdha_2018 total_hh_income_2018 total_income_2018"
 *local var_list = "li_cocoa_inputs_usdha_2018"
 *local var_list = "total_hh_income_2018"
 
