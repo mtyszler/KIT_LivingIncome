@@ -18,6 +18,11 @@ This opensource file was created and is maintained by Marcelo Tyszler
 This project was jointly done with COSA, and it was supported by
 ISEAL, Living Income Community of Practice and GIZ
 
+You are free to use it and modify for your needs. BUT PLEASE CITE US:
+
+Tyszler, et al. (2019). Living Income Calculations Toolbox. KIT ROYAL TROPICAL 
+INSTITUTE and COSA. Available at: 
+
 -----------------------------------------------------------------------------
 Last Update:
 31/10/2019
