@@ -4,11 +4,13 @@ LIVING INCOME CALCULATIONS AND OUTPUTS
 This stata do-file produces density plots as fractions about the distribution
 of underlying variables for the indication of the household income.
 
+It produces graphs similar to what can be seen at:
+https://www.kit.nl/wp-content/uploads/2019/01/Analysis-of-the-income.pdf
+https://docs.wixstatic.com/ugd/0c5ab3_93560a9b816d40c3a28daaa686e972a5.pdf
+
 
 It assumes variables have already been calculated. 
 If note, please check do-files:
-
-
 
 ---------------------------------------------------------------------------
 
