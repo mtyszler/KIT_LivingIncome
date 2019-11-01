@@ -83,6 +83,7 @@ local color_3 = "green%30"
  if "`grouping_var'" !="" {
 	
 	levelsof `grouping_var', local(group_levels)
+	preserve
 	drop if `grouping_var' == .
 	 
  }
@@ -376,3 +377,4 @@ foreach var in `var_list' {
 	
 }
 
+restore
