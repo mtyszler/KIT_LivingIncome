@@ -48,7 +48,15 @@ local sf = "Density_plots_fraction/"
 
 * Variables for which plots need to be created
 * The plots will use the variable labels, therefore make sure these are clear and complete
-local var_list = "cocoa_land_used_morethan5_ha prod_total_last_kg_ha revenue_usdha_2018 li_inputs_usdha_2018 li_hired_usdha_2018 total_income_2018 total_hh_income_2018"
+
+* This list is for variables to which the smoothening plot applies
+local var_list_regular = "prod_total_last_kg_ha revenue_usdha_2018 li_inputs_usdha_2018 li_hired_usdha_2018 total_income_2018 total_hh_income_2018"
+
+* This list is for variables to which hard limits need to be set, for example if the grouping variable is defined by these variables
+* you also need to define min and max for each group, separated by "|"
+local var_list_special = "cocoa_land_used_morethan5_ha"
+local var_list_special_min = "   | 4 | " // this mean second group has a minimum of 4
+local var_list_special_max = " 4 |   | " // this mean first  group has a maximum of 4
 
 * Grouping variable, replace by an empty string for no groupings
 * The plots will use the group labels, therefore make sure these are clear and complete
@@ -88,8 +96,8 @@ local color_3 = "green%30"
 	 
  }
  
-
- foreach var in `var_list' {	
+* Create regular density plots
+foreach var in `var_list_regular' {	
 
 
 	* Define bin size and steps for the density calculation
@@ -166,14 +174,13 @@ local color_3 = "green%30"
 			local counter = 1
 			foreach group in `group_levels' {
 			
-			kdensity `var' if `grouping_var' == `group', gen(x_`var'_`group' y_`var'_`group') nograph kernel(gaus) `extras'
-			replace y_`var'_`group' = y_`var'_`group'*`r(scale)'
-			qui: sum y_`var'_`group'
-			local current_max = max(`r(max)',`current_max')
-			local group_graph = "`group_graph' || line y_`var'_`group' x_`var'_`group', color(`color_`counter'') recast(area)"
-			local counter = `counter'+1
+				kdensity `var' if `grouping_var' == `group', gen(x_`var'_`group' y_`var'_`group') nograph kernel(gaus) `extras'
+				replace y_`var'_`group' = y_`var'_`group'*`r(scale)'
+				qui: sum y_`var'_`group'
+				local current_max = max(`r(max)',`current_max')
+				local group_graph = "`group_graph' || line y_`var'_`group' x_`var'_`group', color(`color_`counter'') recast(area)"
+				local counter = `counter'+1
 			
-
 		}
 	} 
 	else {
@@ -223,125 +230,134 @@ local color_3 = "green%30"
 	
 }
 
-/*
- local var_list = "cocoa_land_used_morethan5_ha"
+
+* Create density plots with hard max and/or min
+* This block is identical to the above, except that it incorporates the max and min limits
+foreach var in `var_list_special' {	
 
 
-foreach var in `var_list' {	
-
-	* ticks_x
+	* Define bin size and steps for the density calculation
 	qui: sum `var'
-	if r(max) < =  2 {
-		local w = 0.1
-	} 
-	else if r(max) < = 50 {
-		local w = 1
-	} 
-	else if r(max) < = 100 {
-		local w = 10
-	}
-	else if r(max) < = 500 {
-		local w = 25
-	}
-	else if r(max) < = 1000 {
-		local w = 50
-	}
-	else if r(max) < = 2000 {
-		local w = 100
-	}
-	else if r(max) < = 5000 {
-		local w = 200
-	}
-	else {
-		local w = 1000
-	}
-	disp "w is `w'"
-	
+    if r(max) < =  2 {
+        local w = 0.1
+    } 
+    else if r(max) < = 50 {
+        local w = 1
+    } 
+    else if r(max) < = 100 {
+        local w = 10
+    }
+    else if r(max) < = 500 {
+        local w = 25
+    }
+    else if r(max) < = 1000 {
+        local w = 50
+    }
+    else if r(max) < = 2000 {
+        local w = 100
+    }
+    else if r(max) < = 5000 {
+        local w = 200
+    }
+    else {
+        local w = 1000
+    }
 	local ticks_x  = "xlabel(0(`w')`r(max)')"
 	
-	local w_2 = 0.5
-	local extras = "at(att) bw(1)"
-	local att_steps = ceil(r(max)/(`w_2'))
-	egen att = seq(), from(0) to(`att_steps')
-	replace att = . if [_n]>`att_steps'
-	replace att = att*(`w_2')
+    * Density bin size is defined as half step of the histogram-like bin size    
+    local w_2 = `w'/2
+	local att_steps = ceil(r(max)/(`w_2')) // number of steps needed
+    egen att = seq(), from(0) to(`att_steps') // place holder for the steps
+    replace att = . if [_n]>`att_steps'
+    replace att = att*(`w_2') // replace for the actual value of the step
+ 	
+	** Prepare additional options to be passed to be kernel computation function
+	** for details type 
+	** help kdensity
+    local extras = "at(att) bw(`w')"
 	
-	
-	* height
-	qui: twoway__histogram_gen `var', gen(height_1 bin_1) frac w(`w') start(0)
-	qui: sum height_1
-	local h =  round(r(max),0.01)
-	qui: drop height_1 bin_1
-	
-	* ticks y
-	local n_ticks = round(`h'/0.1)+1
-	local ticks_y = `"ylabel(0 "0" "'
-	forvalues i = 1(1)`n_ticks'{
-		local t_y = `i'*0.1
-		local t_y_perc = round(`i'*0.1*100)
-		
-		local ticks_y = `"`ticks_y' `t_y' "`t_y_perc'" "'
-	}
-	local ticks_y = `"`ticks_y' )"'
-	
-	
-	local title = "Histogram"
-	
-	local colors = "..\histogram_cocoa_blue"
-		
+    
+	* Prepare global note and labels:
 	qui: sum `var' 
-	local N = r(N)
+	local Note = `""N (All) = `r(N)'""'
+	local labels_cmd = `"label( 1 "All") "'
 	
-	
-	if `N'>0 {
-	
+	* Append group information:
+	if "`grouping_var'" !="" {
+		local counter = 2
+		foreach group in `group_levels' {
 		
-		KIT_histogram_alt `var'  , ///
-		width(`w') height(`h') /// 
-		additional_options(`ticks_x' `ticks_y' /// 
-		 start(0) ///
-		play(`colors') ///
-		note("N = `N'") ///
-		)
-	}
+			qui: sum `var' if  `grouping_var' == `group'
 
-	graph export Density_plots/`var'_`title'.png, width(1000) replace
+			local group_label: label (`grouping_var') `group'
+			
+			local Note = `"`Note' "N (`group_label') = `r(N)'""'
+			local labels_cmd = `"`labels_cmd' label( `counter' "`group_label'")"'
+			local counter = `counter'+1
+			
+		}
 	
-	local Note = ""
-	qui: sum `var' 
-	local Note = "N (All) = `r(N)'"
-	
-	qui: sum `var' if grouping == 1
-	local Note = "`Note', N (Male, typical) = `r(N)'"
-	
-	qui: sum `var' if  grouping == 2
-	local Note = "`Note', N (Male, large) = `r(N)'"
-	
-	qui: sum `var' if  grouping == 3
-	local Note = "`Note', N (Female) = `r(N)'"
-	
-	local Note = "`Note', bin size = `w_2'"
-	
-		capture drop x_`var'* y_`var'*
-	forvalues g = 1/3{
-		kdensity `var' if grouping == `g', gen(x_`var'_`g' y_`var'_`g') nograph kernel(gaus)  `extras'
-		replace y_`var'_`g' = y_`var'_`g'*`r(scale)'
-		qui: sum y_`var'_`g'
-		local max_`g' = `r(max)'
 	}
+	
+	local Note = `"`Note' "bin size = `w_2'""'
+	
+	capture drop x_`var'* y_`var'*
+	
+	local current_max = 0
+	** Compute kernels of each group
+	if "`grouping_var'" !="" {
+			local group_graph = ""
+			local counter = 1
+			foreach group in `group_levels' {
+			
+				* read min and max:
+				gettoken this_min var_list_special_min: var_list_special_min, parse("|")
+				gettoken this_max var_list_special_max: var_list_special_max, parse("|")
+				
+				local min_max = ""
+				if real("`this_min'")!=. | real("`this_max'")!=. {
+					local min_max = "if "
+					
+					if real("`this_min'")!=. {
+					
+						local min_max = "`min_max' x_`var'_`group'>=`this_min' "
+						
+						if real("`this_max'")!=. { 
+							local min_max = "`min_max' & "
+						}
+					}
+					
+					if real("`this_max'")!=. {
+					
+						local min_max = "`min_max' x_`var'_`group'<=`this_max' "
+						
+					}
+				}
+				
+				
+				kdensity `var' if `grouping_var' == `group', gen(x_`var'_`group' y_`var'_`group') nograph kernel(gaus) `extras'
+				replace y_`var'_`group' = y_`var'_`group'*`r(scale)'
+				qui: sum y_`var'_`group'
+				local current_max = max(`r(max)',`current_max')
+				local group_graph = "`group_graph' || line y_`var'_`group' x_`var'_`group' `min_max', color(`color_`counter'') recast(area)"
+				local counter = `counter'+1
+			
+
+		}
+	} 
+	else {
+		local group_graph = "`group_graph' color(`color_1') recast(area) lcolor(black)"
+	}
+	
+
+	* Compute kernel for the whole sample
 	kdensity `var' , gen(x_`var' y_`var') nograph kernel(gaus) `extras'
 	replace y_`var' = y_`var'*`r(scale)'
 	qui: sum y_`var'
-	local max_tot = `r(max)'
+	local current_max = max(`r(max)',`current_max')
 	
-	local h =  round(max(`max_1',`max_2',`max_3',`max_tot'),0.01) 
+	local h =  round(`current_max',0.01) 
 	
-	/*
-	local h = 0.1
-	if "`var'"=="li_cocoa_hired_usdha_2018"{
-		local h = 0.16
-	}
-	*/
 	
 	* ticks y
 	if `h'>0.16 {
@@ -361,15 +377,14 @@ foreach var in `var_list' {
 	}
 	local ticks_y = `"`ticks_y' )"'
 			
-	* 1 "Male, small" 2 "Male, large" 3 "Female"
+	* Generate main graph
+	disp "`group_graph'"
+	disp `"`labels_cmd'"'
 	line y_`var' x_`var',   /// 
-	legend(label( 1 "All") label( 2 "Male-headed, typical") label( 3 "Male-headed, large") label( 4 "Female-headed")) ///
-	ytitle("Proportion of households (%)") `ticks_x' `ticks_y'  xlabel(, labsize(small)) note("`Note'") graphregion(color(white)) || ///
-	line y_`var'_1 x_`var'_1 if  x_`var'_1<=4, color(ebblue%30) recast(area)  || /// 
-	line y_`var'_2 x_`var'_2 if  x_`var'_2>=4, color(blue%30) recast(area) || ///
-	line y_`var'_3 x_`var'_3, color(green%30) recast(area)
+	legend(`labels_cmd') ///
+	ytitle("Proportion of households (%)") `ticks_x' `ticks_y'  xlabel(, labsize(small)) note(`Note') graphregion(color(white)) `group_graph'
 	
-	graph export Density_plots_fraction/`var'_density_plot.png, width(1000) replace
+	graph export "`sf'`var'_density_plot.png", width(1000) replace
 	
 	drop x_`var'* y_`var'* att
 	
