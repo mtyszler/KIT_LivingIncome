@@ -53,10 +53,12 @@ local sf = "Density_plots_fraction/"
 local var_list_regular = "prod_total_last_kg_ha revenue_usdha_2018 li_inputs_usdha_2018 li_hired_usdha_2018 total_income_2018 total_hh_income_2018"
 
 * This list is for variables to which hard limits need to be set, for example if the grouping variable is defined by these variables
+* you can leave it empty if not needed
 * you also need to define min and max for each group, separated by "|"
 local var_list_special = "cocoa_land_used_morethan5_ha"
 local var_list_special_min = "   | 4 | " // this mean second group has a minimum of 4
 local var_list_special_max = " 4 |   | " // this mean first  group has a maximum of 4
+*local var_list_special = "" // uncomment for no special case
 
 * Grouping variable, replace by an empty string for no groupings
 * The plots will use the group labels, therefore make sure these are clear and complete
