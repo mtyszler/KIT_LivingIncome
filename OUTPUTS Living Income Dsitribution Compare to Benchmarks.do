@@ -1,3 +1,94 @@
+/*****************************************************************************
+LIVING INCOME CALCULATIONS AND OUTPUTS
+
+This stata do-file produces density (kernel smoothened) plots as fractions about 
+the total household income with the goal of comparing to the benchmark value
+
+It produces graphs similar to what can be seen at:
+https://www.kit.nl/wp-content/uploads/2019/01/Analysis-of-the-income.pdf
+https://docs.wixstatic.com/ugd/0c5ab3_93560a9b816d40c3a28daaa686e972a5.pdf
+
+
+It assumes variables have already been calculated. 
+If note, please check do-files:
+
+---------------------------------------------------------------------------
+
+This opensource file was created and is maintained by Marcelo Tyszler
+(m.tyszler@kit.nl), from KIT Royal Tropical Institute, Amsterdam.
+
+This project was jointly done with COSA, and it was supported by
+ISEAL, Living Income Community of Practice and GIZ
+
+You are free to use it and modify for your needs. BUT PLEASE CITE US:
+
+Tyszler, et al. (2019). Living Income Calculations Toolbox. KIT ROYAL TROPICAL 
+INSTITUTE and COSA. Available at: 
+
+-----------------------------------------------------------------------------
+Last Update:
+1/11/2019
+
+*****************************************************************************/
+
+
+***** TO BE ADJUSTED BY THE USER ********/
+** As a user you need to adjust these values:
+
+
+* Dataset:
+local ds_filename = "data_cleaned_LI.dta"
+
+* Sub-folder where the graphs will be saved:
+*==> Notice the trailing "/"
+* If no subfolder is required, replace the local by an empty string, ""
+local sf = "Density_plots_fraction/"
+*local sf = "" // uncomment for no subfolder
+
+* Variables for which plots need to be created
+* The plot will use the variable label, therefore make sure these are clear and complete
+
+* This list is for variables to which the smoothening plot applies
+local total_hh_income = "total_hh_income"
+
+* Grouping variable, replace by an empty string for no groupings
+* The plots will use the group labels, therefore make sure these are clear and complete
+local grouping_var = "grouping"
+*local grouping_var = "" // uncomment for no groups
+
+** Color for the groups:
+* we preset 3 colors, add more if needed:
+local color_1 = "ebblue%30"
+local color_2 = "blue%30"
+local color_3 = "green%30"
+
+***** END OF TO BE ADJUSTED BY THE USER ********
+
+
+
+
+***** TO BE ADJUSTED ONLY  BY ADVANCED USERS ********/
+** As a user you should not modify the rows below.
+** Only do so, if you are confident on what you are doing. 
+ 
+ 
+ 
+ * load file
+ use `ds_filename', replace
+ 
+ * create sub-folder if not existent:
+ capture mkdir "`sf'"
+ 
+ 
+ * Identify groups:
+ if "`grouping_var'" !="" {
+	
+	levelsof `grouping_var', local(group_levels)
+	preserve
+	drop if `grouping_var' == .
+	 
+ }
+ 
  use data_cleaned_LI, replace
 
 local var_list = "total_hh_income_2018"
