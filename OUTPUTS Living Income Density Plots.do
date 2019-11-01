@@ -1,8 +1,8 @@
 /*****************************************************************************
 LIVING INCOME CALCULATIONS AND OUTPUTS
 
-This stata do-file produces density plots as fractions about the distribution
-of underlying variables for the indication of the household income.
+This stata do-file produces density (kernel smoothened) plots as fractions about 
+the distribution of underlying variables for the indication of the household income.
 
 It produces graphs similar to what can be seen at:
 https://www.kit.nl/wp-content/uploads/2019/01/Analysis-of-the-income.pdf
@@ -41,7 +41,7 @@ local ds_filename = "data_cleaned_LI.dta"
 
 * Sub-folder where the graphs will be saved:
 *==> Notice the trailing "/"
-* If no sf is required, replace the local by an empty string, ""
+* If no subfolder is required, replace the local by an empty string, ""
 local sf = "Density_plots_fraction/"
 *local sf = "" // uncomment for no subfolder
 
@@ -51,11 +51,12 @@ local sf = "Density_plots_fraction/"
 local var_list = "cocoa_land_used_morethan5_ha prod_total_last_kg_ha revenue_usdha_2018 li_inputs_usdha_2018 li_hired_usdha_2018 total_income_2018 total_hh_income_2018"
 
 * Grouping variable, replace by an empty string for no groupings
+* The plots will use the group labels, therefore make sure these are clear and complete
 local grouping_var = "grouping"
 *local grouping_var = "" // uncomment for no groups
 
 ** Color for the groups:
-* we preset 3 colors:
+* we preset 3 colors, add more if needed:
 local color_1 = "ebblue%30"
 local color_2 = "blue%30"
 local color_3 = "green%30"
@@ -67,7 +68,7 @@ local color_3 = "green%30"
 
 ***** TO BE ADJUSTED ONLY  BY ADVANCED USERS ********/
 ** As a user you should not modify the rows below.
-** Only do so, if you are confident of what you are doing. 
+** Only do so, if you are confident on what you are doing. 
  
  
  
@@ -116,12 +117,14 @@ local color_3 = "green%30"
     else {
         local w = 1000
     }
-        
+	local ticks_x  = "xlabel(0(`w')`r(max)')"
+	
+    * Density bin size is defined as half step of the histogram-like bin size    
     local w_2 = `w'/2
-	local att_steps = ceil(r(max)/(`w_2'))
-    egen att = seq(), from(0) to(`att_steps')
+	local att_steps = ceil(r(max)/(`w_2')) // number of steps needed
+    egen att = seq(), from(0) to(`att_steps') // place holder for the steps
     replace att = . if [_n]>`att_steps'
-    replace att = att*(`w_2')
+    replace att = att*(`w_2') // replace for the actual value of the step
  	
 	** Prepare additional options to be passed to be kernel computation function
 	** for details type 
