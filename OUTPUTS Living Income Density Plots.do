@@ -308,6 +308,7 @@ foreach var in `var_list_special' {
 	local current_max = 0
 	** Compute kernels of each group
 	if "`grouping_var'" !="" {
+			local min_max_all =  ""
 			local group_graph = ""
 			local counter = 1
 			foreach group in `group_levels' {
@@ -346,9 +347,36 @@ foreach var in `var_list_special' {
 			
 
 		}
+		
 	} 
 	else {
-		local group_graph = "`group_graph' color(`color_1') recast(area) lcolor(black)"
+	
+		* read min and max:
+		gettoken this_min var_list_special_min: var_list_special_min, parse("|")
+		gettoken this_max var_list_special_max: var_list_special_max, parse("|")
+		
+		local min_max = ""
+		if real("`this_min'")!=. | real("`this_max'")!=. {
+			local min_max = "if "
+			
+			if real("`this_min'")!=. {
+			
+				local min_max = "`min_max' x_`var'>=`this_min' "
+				
+				if real("`this_max'")!=. { 
+					local min_max = "`min_max' & "
+				}
+			}
+			
+			if real("`this_max'")!=. {
+			
+				local min_max = "`min_max' x_`var'<=`this_max' "
+				
+			}
+		}
+			
+		local group_graph = "color(`color_1') recast(area) lcolor(black)"
+		local min_max_all =  "`min_max'"
 	}
 	
 
@@ -380,7 +408,7 @@ foreach var in `var_list_special' {
 	local ticks_y = `"`ticks_y' )"'
 			
 	* Generate main graph
-	line y_`var' x_`var',   /// 
+	line y_`var' x_`var' `min_max_all',   /// 
 	legend(`labels_cmd') ///
 	ytitle("Proportion of households (%)") `ticks_x' `ticks_y'  xlabel(, labsize(small)) note(`Note') graphregion(color(white)) `group_graph'
 	
