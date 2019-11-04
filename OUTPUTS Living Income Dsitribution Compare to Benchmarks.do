@@ -333,7 +333,7 @@ if "`grouping_var'" !="" {
 else {
 *local group_graph = "`group_graph' color(`color_1') recast(area) lcolor(black)"
 	local group_bm_line = " || pci 0 `li_benchmark_1' `h_1' `li_benchmark_1', color(`color_1')"
-	local group_bm_box = `" text(`h_`counter'' `li_benchmark_`counter'' "Living Income Benchmark", size(small)  place(right) box margin(1 1 1 1) fcolor(`color_1'))"'	
+	local group_bm_box = `" text(`h_1' `li_benchmark_1' "Living Income Benchmark", size(small)  place(right) box margin(1 1 1 1) fcolor(`color_1'))"'	
 }
 
 
