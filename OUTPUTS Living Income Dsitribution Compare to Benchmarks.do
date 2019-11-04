@@ -154,6 +154,7 @@ local labels_cmd = `"label( 1 "All") "'
 * Append group information:
 if "`grouping_var'" !="" {
 	local counter = 2
+	local cmd_order = "order (1 "
 	foreach group in `group_levels' {
 	
 		qui: sum `var' if  `grouping_var' == `group'
@@ -162,10 +163,16 @@ if "`grouping_var'" !="" {
 		
 		local Note_full= `"`Note_full' "N (`group_label') = `r(N)'""'
 		local labels_cmd = `"`labels_cmd' label( `counter' "`group_label'")"'
+		local cmd_order = "`cmd_order' `counter'"
 		local counter = `counter'+1
 		
 	}
-
+	
+	local cmd_order = "`cmd_order')"
+	local labels_cmd = `"`labels_cmd' `cmd_order'"'
+} 
+else {
+	local labels_cmd = `"label( 1 "All") order(1)"'
 }
 
 local Note = `"`Note' "bin size = `w_2'""'
@@ -333,7 +340,7 @@ else {
 line y_`var' x_`var',   /// 
 ytitle("Proportion of households (%)") `ticks_x' `ticks_y'  xtitle("`this_var'") ///
 xlabel(, labsize(small)) note(`Note_full') graphregion(color(white)) ///
-legend(`labels_cmd' order(1 2 3 4)) ///
+legend(`labels_cmd') ///
 `group_graph' ///
 `group_bm_line' ///
 `group_bm_box' 
