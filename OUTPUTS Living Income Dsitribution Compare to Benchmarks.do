@@ -185,8 +185,6 @@ if "`grouping_var'" !="" {
 			qui: sum y_`var'_`group'
 			local current_max = max(`r(max)',`current_max')
 			local group_graph = "`group_graph' || line y_`var'_`group' x_`var'_`group', color(`color_`counter'') recast(area)"
-			local group_bm_line = "`group_bm_line' || pci 0 `li_benchmark_`counter'' `h_`counter'' `li_benchmark_`counter'', color(`color_`counter'')"
-			local group_bm_box = "`group_bm_box' || text(`h_`counter'' `li_benchmark_`counter'' 'Living Income `group_label'', size(small)  place(right) box margin(1 1 1 1) fcolor(`color_`counter''))"
 		
 			local counter = `counter'+1
 	
