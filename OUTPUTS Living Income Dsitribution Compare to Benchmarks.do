@@ -175,7 +175,7 @@ else {
 	local labels_cmd = `"label( 1 "All") order(1)"'
 }
 
-local Note = `"`Note' "bin size = `w_2'""'
+local Note_full = `"`Note_full' "bin size = `w_2'""'
 
 capture drop x_`var'* y_`var'*
 
