@@ -53,7 +53,8 @@ local total_hh_income = "total_hh_income"
 
 * This indicates if the benchmark has been achieved
 local bm_achieved = "li_benchmark_achieved"
-* Values of the benchmark, per group
+* Values of the benchmark, per group, with increasing integer numbers in the order they appear:
+* At least 1 benchmark is needed, if no grouping takes place
 local li_benchmark_1 = 4742
 local li_benchmark_2 = 5123
 local li_benchmark_3 = 4001
@@ -64,7 +65,7 @@ local grouping_var = "grouping"
 *local grouping_var = "" // uncomment for no groups
 
 ** Color for the groups:
-* we preset 3 colors, add more if needed:
+* we preset 3 colors, add more if needed, with increasing integer numbers:
 local color_1 = "ebblue%30"
 local color_2 = "blue%30"
 local color_3 = "green%30"
