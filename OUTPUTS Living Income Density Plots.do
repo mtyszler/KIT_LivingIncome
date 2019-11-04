@@ -392,4 +392,6 @@ foreach var in `var_list_special' {
 	
 }
 
-restore
+if "`grouping_var'" !="" {
+	restore
+}
