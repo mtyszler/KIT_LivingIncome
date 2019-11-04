@@ -51,6 +51,7 @@ local sf = "Density_plots_fraction/"
 
 * This list is for variables to which the smoothening plot applies
 local var_list_regular = "prod_total_last_kg_ha revenue_usdha_2018 li_inputs_usdha_2018 li_hired_usdha_2018 total_income_2018 total_hh_income_2018"
+*local var_list_regular = "" // uncomment for no regular variables
 
 * This list is for variables to which hard limits need to be set, for example if the grouping variable is defined by these variables
 * you can leave it empty if not needed
