@@ -10,7 +10,7 @@ https://docs.wixstatic.com/ugd/0c5ab3_93560a9b816d40c3a28daaa686e972a5.pdf
 
 
 It assumes variables have already been calculated. 
-If note, please check do-files:
+If not, please check do-files:
 
 ---------------------------------------------------------------------------
 
