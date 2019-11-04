@@ -308,7 +308,7 @@ if "`grouping_var'" !="" {
 	drop current_sort
 }
 else {
-	local h_1 = li_benchmark_1
+	local h_1 = `h'
 }
 
 
