@@ -66,7 +66,8 @@ local grouping_var = "grouping"
 *local grouping_var = "" // uncomment for no groups
 
 ** Color for the groups:
-* we preset 3 colors, add more if needed:
+* we preset 3 colors, add more if needed, with increasing integer numbers:
+* %30 refers to 30% transparency
 local color_1 = "ebblue%30"
 local color_2 = "blue%30"
 local color_3 = "green%30"
