@@ -69,6 +69,10 @@ local color_1 = "ebblue%30"
 local color_2 = "blue%30"
 local color_3 = "green%30"
 
+** Spacing between labels
+* Increase if you want more space between the group labels in the final graph
+local spacing = 0.02
+
 ***** END OF TO BE ADJUSTED BY THE USER ********
 
 
@@ -259,12 +263,42 @@ if "`grouping_var'" !="" {
 
 
 ** All together
-*foreach counter of numlist 1/10{
-*}
+** Decide on the heights, ordering by benchmark value:
+local counter = 1
+gen temp_order_height = .
+gen temp_order_height_counter = .
+foreach group in `group_levels' {
 
-local h_3 = `h'
-local h_1 = `h_3' -0.02
-local h_2 = `h_1' -0.02
+	replace temp_order_height =  `li_benchmark_`counter'' in `counter'
+	replace temp_order_height_counter =  `counter' in `counter'
+	local counter = `counter'+1
+	
+}
+
+gen current_sort = [_n]
+sort temp_order_height
+
+local counter = 1
+foreach group in `group_levels' {
+
+	if `counter' == 1 {
+		local this_counter = temp_order_height_counter[`counter']
+		local h_`this_counter'  = `h'
+
+	} 
+	else {
+		local this_counter = temp_order_height_counter[`counter']
+		local previous_counter = temp_order_height_counter[`counter'-1]
+		local h_`this_counter'  = `h_`previous_counter'' - `spacing'
+	}
+	
+	local counter = `counter'+1
+		
+}
+
+drop temp_order_height_counter temp_order_height
+sort current_sort
+drop current_sort
 
 
 if "`grouping_var'" !="" {
