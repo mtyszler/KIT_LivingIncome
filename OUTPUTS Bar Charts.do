@@ -163,7 +163,7 @@ if "`food'" !="" {
 	replace temp_gap_benchmark =  temp_gap_benchmark - temp_food
 	 
 	graph bar (mean) temp_gap_cocoa temp_gap_total  temp_food temp_gap_benchmark `this_over' ///
-	stack legend(label(1 "`label_main_income'") label(2 "`label_remaining_income'") label(3 "Value of crops consumed at home") label(4 "Gap to the Living Income Benchmark")) ///
+	stack legend(label(1 "`label_main_income'") label(2 "`label_remaining_income'") label(3 "Value of crops consumed at home") label(4 "Gap to the Living Income Benchmark") size(vsmall)) ///
 	ytitle("`currency'/year/household")  ///
 	bar(1, color(`color_main')) ///
 	bar(2, color(`color_remaining')) ///
@@ -173,7 +173,7 @@ if "`food'" !="" {
 	graphregion(color(white)) bgcolor(white) ///
 	title("Mean values")
 	 
-	 graph play gap_wtih_food_adjust
+	
 	 
 	graph export "`sf'`var'bar_LI_gap_FOOD_mean.png", width(1000) replace
 }
