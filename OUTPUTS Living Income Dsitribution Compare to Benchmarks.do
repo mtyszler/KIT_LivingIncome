@@ -319,7 +319,6 @@ if "`grouping_var'" !="" {
 	}
 } 
 
-disp `"`group_bm_box'"'
 
 line y_`var' x_`var',   /// 
 ytitle("Proportion of households (%)") `ticks_x' `ticks_y'  xtitle("`this_var'") ///
