@@ -240,7 +240,7 @@ if "`grouping_var'" !="" {
 		local this_median = `r(p50)'
 		qui: sum y_`var'_1, det
 
-		qui: sum `bm_achieved' if grouping == 1
+		qui: sum `bm_achieved' if `grouping_var' == `group'
 		local share_li = round((`r(mean)')*100,0.1)
 		local share_li = ustrleft(string(`share_li'),4) + "%"
 		
