@@ -96,7 +96,7 @@ local spacing = 0.02
  if "`grouping_var'" !="" {
 	
 	levelsof `grouping_var', local(group_levels)
-	*preserve
+	preserve
 	drop if `grouping_var' == .
 	 
  }
@@ -350,4 +350,8 @@ graph export Density_plots_fraction/`var'_living_income_bechmark.png, width(1000
 *************
 
 drop x_`var'* y_`var'* att
-*restore
+
+if "`grouping_var'" !="" {
+	restore
+}
+
