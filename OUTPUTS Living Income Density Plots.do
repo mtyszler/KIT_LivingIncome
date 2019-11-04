@@ -188,7 +188,7 @@ foreach var in `var_list_regular' {
 		}
 	} 
 	else {
-		local group_graph = "`group_graph' color(`color_1') recast(area) lcolor(black)"
+		local group_graph = " color(`color_1') recast(area) lcolor(black)"
 	}
 	
 
