@@ -219,8 +219,6 @@ foreach var in `var_list_regular' {
 	local ticks_y = `"`ticks_y' )"'
 			
 	* Generate main graph
-	disp "`group_graph'"
-	disp `"`labels_cmd'"'
 	line y_`var' x_`var',   /// 
 	legend(`labels_cmd') ///
 	ytitle("Proportion of households (%)") `ticks_x' `ticks_y'  xlabel(, labsize(small)) note(`Note') graphregion(color(white)) `group_graph'
@@ -381,8 +379,6 @@ foreach var in `var_list_special' {
 	local ticks_y = `"`ticks_y' )"'
 			
 	* Generate main graph
-	disp "`group_graph'"
-	disp `"`labels_cmd'"'
 	line y_`var' x_`var',   /// 
 	legend(`labels_cmd') ///
 	ytitle("Proportion of households (%)") `ticks_x' `ticks_y'  xlabel(, labsize(small)) note(`Note') graphregion(color(white)) `group_graph'
