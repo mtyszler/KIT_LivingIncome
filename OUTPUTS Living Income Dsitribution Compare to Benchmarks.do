@@ -250,7 +250,7 @@ if "`grouping_var'" !="" {
 		pci 0 `this_mean' `h' `this_mean', color(blue) || ///
 		pci 0 `this_median' `h' `this_median', color(green) ///
 		xtitle("`this_var'") ///
-		text(`h' `li_benchmark_`counter'' "`share_li'", place(right))
+		text(`h' `li_benchmark_`counter'' "`share_li' above the benchmark", place(right))
 		
 		graph export "`sf'`var'_living_income_bechmark `group_label'.png", width(1000) replace
 		
@@ -263,41 +263,46 @@ if "`grouping_var'" !="" {
 
 ** All together
 ** Decide on the heights, ordering by benchmark value:
-local counter = 1
-gen temp_order_height = .
-gen temp_order_height_counter = .
-foreach group in `group_levels' {
+if "`grouping_var'" !="" {
+	local counter = 1
+	gen temp_order_height = .
+	gen temp_order_height_counter = .
+	foreach group in `group_levels' {
 
-	replace temp_order_height =  `li_benchmark_`counter'' in `counter'
-	replace temp_order_height_counter =  `counter' in `counter'
-	local counter = `counter'+1
-	
-}
-
-gen current_sort = [_n]
-sort temp_order_height
-
-local counter = 1
-foreach group in `group_levels' {
-
-	if `counter' == 1 {
-		local this_counter = temp_order_height_counter[`counter']
-		local h_`this_counter'  = `h'
-
-	} 
-	else {
-		local this_counter = temp_order_height_counter[`counter']
-		local previous_counter = temp_order_height_counter[`counter'-1]
-		local h_`this_counter'  = `h_`previous_counter'' - `spacing'
-	}
-	
-	local counter = `counter'+1
+		replace temp_order_height =  `li_benchmark_`counter'' in `counter'
+		replace temp_order_height_counter =  `counter' in `counter'
+		local counter = `counter'+1
 		
-}
+	}
 
-drop temp_order_height_counter temp_order_height
-sort current_sort
-drop current_sort
+	gen current_sort = [_n]
+	sort temp_order_height
+
+	local counter = 1
+	foreach group in `group_levels' {
+
+		if `counter' == 1 {
+			local this_counter = temp_order_height_counter[`counter']
+			local h_`this_counter'  = `h'
+
+		} 
+		else {
+			local this_counter = temp_order_height_counter[`counter']
+			local previous_counter = temp_order_height_counter[`counter'-1]
+			local h_`this_counter'  = `h_`previous_counter'' - `spacing'
+		}
+		
+		local counter = `counter'+1
+			
+	}
+
+	drop temp_order_height_counter temp_order_height
+	sort current_sort
+	drop current_sort
+}
+else {
+	local h_1 = li_benchmark_1
+}
 
 
 if "`grouping_var'" !="" {
@@ -318,6 +323,11 @@ if "`grouping_var'" !="" {
 		
 	}
 } 
+else {
+*local group_graph = "`group_graph' color(`color_1') recast(area) lcolor(black)"
+	local group_bm_line = " || pci 0 `li_benchmark_1' `h_1' `li_benchmark_1', color(`color_1')"
+	local group_bm_box = `" text(`h_`counter'' `li_benchmark_`counter'' "Living Income Benchmark", size(small)  place(right) box margin(1 1 1 1) fcolor(`color_1'))"'	
+}
 
 
 line y_`var' x_`var',   /// 
