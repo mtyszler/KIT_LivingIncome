@@ -152,6 +152,23 @@ graphregion(color(white)) bgcolor(white) ///
 title("Mean values")
  
 graph export "`sf'`var'bar_LI_gap_mean.png", width(1000) replace
+
+gen temp_gap_benchmark_share = temp_gap_benchmark/temp_benchmark*100
+gen temp_gap_total_share = temp_gap_total/temp_benchmark*100
+gen temp_gap_cocoa_share = temp_gap_cocoa/temp_benchmark*100
+ 
+graph bar (mean) temp_gap_cocoa_share temp_gap_total_share  temp_gap_benchmark_share `this_over' ///
+stack legend(label(1 "`label_main_income'") label(2 "`label_remaining_income'") label(3 "Gap to the Living Income Benchmark")) ///
+ytitle("% of the benchmark value")  ///
+bar(1, color(`color_main')) ///
+bar(2, color(`color_remaining')) ///
+bar(3, color(`color_gap')) ///
+blabel(bar, format(%9.0f) position(center) ) ///
+graphregion(color(white)) bgcolor(white) ///
+title("Mean values in relation to the benchmark value")
+ 
+graph export "`sf'`var'bar_LI_gap_mean_as_share.png", width(1000) replace 
+ 
  
 ** MEAN, ncluding value of food 
 if "`food'" !="" {
@@ -172,6 +189,24 @@ if "`food'" !="" {
 	
 	 
 	graph export "`sf'`var'bar_LI_gap_FOOD_mean.png", width(1000) replace
+	
+	gen temp_food_share =  temp_food/temp_benchmark*100
+	replace temp_gap_benchmark_share =  temp_gap_benchmark_share - temp_food_share
+	 
+	graph bar (mean) temp_gap_cocoa_share temp_gap_total_share  temp_food_share temp_gap_benchmark_share `this_over' ///
+	stack legend(label(1 "`label_main_income'") label(2 "`label_remaining_income'") label(3 "Value of crops consumed at home") label(4 "Gap to the Living Income Benchmark") size(vsmall)) ///
+	ytitle("% of the benchmark value")  ///
+	bar(1, color(`color_main')) ///
+	bar(2, color(`color_remaining')) ///
+	bar(4, color(`color_gap')) ///
+	bar(3, color(`color_food')) ///
+	blabel(bar, format(%9.0f) position(center) ) ///
+	graphregion(color(white)) bgcolor(white) ///
+	title("Mean values in relation to the benchmark value")
+	 
+	
+	 
+	graph export "`sf'`var'bar_LI_gap_FOOD_mean_as_share.png", width(1000) replace
 }
 
 
@@ -220,6 +255,23 @@ graphregion(color(white)) bgcolor(white) ///
 title("Median values")
  
 graph export "`sf'`var'bar_LI_gap_median.png", width(1000) replace
+
+gen temp_gap_benchmark_share = temp_gap_benchmark/temp_benchmark*100
+gen temp_gap_total_share = temp_gap_total/temp_benchmark*100
+gen temp_gap_cocoa_share = temp_gap_cocoa/temp_benchmark*100
+ 
+graph bar (mean) temp_gap_cocoa_share temp_gap_total_share  temp_gap_benchmark_share `this_over' ///
+stack legend(label(1 "`label_main_income'") label(2 "`label_remaining_income'") label(3 "Gap to the Living Income Benchmark")) ///
+ytitle("% of the benchmark value")  ///
+bar(1, color(`color_main')) ///
+bar(2, color(`color_remaining')) ///
+bar(3, color(`color_gap')) ///
+blabel(bar, format(%9.0f) position(center) ) ///
+graphregion(color(white)) bgcolor(white) ///
+title("Median values in relation to the benchmark value")
+ 
+graph export "`sf'`var'bar_LI_gap_median_as_share.png", width(1000) replace 
+ 
  
 
 restore
