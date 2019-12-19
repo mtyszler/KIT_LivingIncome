@@ -84,7 +84,7 @@ local color_food = "orange%30" // intrinsic value of food
 
 ***** END OF TO BE ADJUSTED BY THE USER ********
 
-***** TO BE ADJUSTED ONLY  BY ADVANCED USERS ********/
+***** TO BE ADJUSTED ONLY BY ADVANCED USERS ********/
 ** As a user you should not modify the rows below.
 ** Only do so, if you are confident on what you are doing. 
  
