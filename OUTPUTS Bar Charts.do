@@ -140,10 +140,6 @@ else {
 gen temp_gap_benchmark = temp_benchmark - temp_gap_total
 replace temp_gap_total = temp_gap_total - temp_gap_cocoa
 
-local label_main_income = "Income from main crop"
-local label_remaining_income = "Other income"
-
-
  
 graph bar (mean) temp_gap_cocoa temp_gap_total  temp_gap_benchmark `this_over' ///
 stack legend(label(1 "`label_main_income'") label(2 "`label_remaining_income'") label(3 "Gap to the Living Income Benchmark")) ///
@@ -211,10 +207,6 @@ else {
 
 gen temp_gap_benchmark = temp_benchmark - temp_gap_total
 replace temp_gap_total = temp_gap_total - temp_gap_cocoa
-
-local label_main_income = "Income from main crop"
-local label_remaining_income = "Other income"
-
 
  
 graph bar (mean) temp_gap_cocoa temp_gap_total  temp_gap_benchmark `this_over' ///
