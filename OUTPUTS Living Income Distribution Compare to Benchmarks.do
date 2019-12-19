@@ -248,7 +248,7 @@ if "`grouping_var'" !="" {
 
 		qui: sum `bm_achieved' if `grouping_var' == `group'
 		local share_li = round((`r(mean)')*100,0.1)
-		local share_li = ustrleft(string(`share_li'),4) + "%"
+		local share_li_`counter' = ustrleft(string(`share_li'),4) + "%"
 		
 		line y_`var'_`group' x_`var'_`group', color(`color_`counter'') recast(area) ///
 		ytitle("Proportion of households (%)") `ticks_x' `ticks_y'  xlabel(, labsize(small)) note("`Note'") graphregion(color(white)) ///
@@ -257,12 +257,10 @@ if "`grouping_var'" !="" {
 		pci 0 `this_mean' `h' `this_mean', color(blue) || ///
 		pci 0 `this_median' `h' `this_median', color(green) ///
 		xtitle("`this_var'") ///
-		text(`h' `li_benchmark_`counter'' "`share_li' above the benchmark", place(right))
+		text(`h' `li_benchmark_`counter'' "`share_li_`counter'' above the benchmark", place(right))
 		
 		graph export "`sf'`var'_living_income_bechmark `group_label'.png", width(1000) replace
-		
-		local share_li_`group' = "`share_li'" + " (`group_label')"
-		
+			
 		local counter = `counter'+1
 	}
 }
@@ -319,10 +317,10 @@ if "`grouping_var'" !="" {
 		foreach group in `group_levels' {
 		
 			local group_label: label (`grouping_var') `group'
-		
+				
 			
 			local group_bm_line = "`group_bm_line' || pci 0 `li_benchmark_`counter'' `h_`counter'' `li_benchmark_`counter'', color(`color_`counter'')"
-			local group_bm_box = `"`group_bm_box' text(`h_`counter'' `li_benchmark_`counter'' "Living Income `group_label'", size(small)  place(right) box margin(1 1 1 1) fcolor(`color_`counter''))"'
+			local group_bm_box = `"`group_bm_box' text(`h_`counter'' `li_benchmark_`counter'' "Living Income `group_label': `share_li_`counter'' above", size(small)  place(right) box margin(1 1 1 1) fcolor(`color_`counter''))"'
 		
 			local counter = `counter'+1
 	
@@ -331,7 +329,7 @@ if "`grouping_var'" !="" {
 	}
 } 
 else {
-*local group_graph = "`group_graph' color(`color_1') recast(area) lcolor(black)"
+
 	local group_bm_line = " || pci 0 `li_benchmark_1' `h_1' `li_benchmark_1', color(`color_1')"
 	local group_bm_box = `" text(`h_1' `li_benchmark_1' "Living Income Benchmark", size(small)  place(right) box margin(1 1 1 1) fcolor(`color_1'))"'	
 }
