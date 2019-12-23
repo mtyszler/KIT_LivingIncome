@@ -276,111 +276,117 @@ if "`grouping_var'" !="" {
 	local this_row = `this_row' + 2
 	qui: putexcel `this_col_str'`this_row'= `r(N)' ,  nformat(number) 
 
-**** Export content for groups
-// D = ASCII(68)
-local this_col = 68
 
-foreach group in `group_levels' {
-	local this_row = 1
-	local this_col_str = char(`this_col')
 	
+if "`grouping_var'" !="" {	
+	**** Export content for groups
+	// D = ASCII(68)
+	local this_col = 68
 
-	local title: label (`grouping_var') `group'
+	foreach group in `group_levels' {
+		local this_row = 1
+		local this_col_str = char(`this_col')
+		
 
-	** Title
-	disp "`title'"
-	local this_row = `this_row' + 1
-	qui: putexcel `this_col_str'`this_row'= "`title'" , font(Calibri, 11, white) bold fpattern(solid,  "91 155 213") hcenter 
-		
-	* Productivity
-	local this_row = `this_row' + 1
-	local p1 = `this_row'+2
-	local p2 = `this_row'+1
-	qui: putexcel `this_col_str'`this_row'= formula(`this_col_str'`p1'/`this_col_str'`p2'), nformat(number_sep) 
-		
-	* Farm size
-	qui: sum `productive_farm' if  `grouping_var'==`group', det
-	local this_row = `this_row' + 1
-	qui: putexcel `this_col_str'`this_row'= `r(`export_what')', nformat(0.0) 
-		
-	* Total Production 
-	qui: sum `total_production' if  `grouping_var'==`group', det
-	local this_row = `this_row' + 1
-	qui: putexcel `this_col_str'`this_row'= `r(`export_what')', nformat(number_sep) 
+		local title: label (`grouping_var') `group'
+
+		** Title
+		disp "`title'"
+		local this_row = `this_row' + 1
+		qui: putexcel `this_col_str'`this_row'= "`title'" , font(Calibri, 11, white) bold fpattern(solid,  "91 155 213") hcenter 
 			
-	* Price
-	qui: sum `price' if  `grouping_var'==`group', det
-	local this_row = `this_row' + 1 
-	qui: putexcel `this_col_str'`this_row'= `r(`export_what')', nformat(currency_d2_negbra) 
-	
-	* Value of prod
-	qui: sum `revenue_total' if  `grouping_var'==`group', det
-	local this_row = `this_row' + 1
-	qui: putexcel `this_col_str'`this_row'= `r(`export_what')', nformat(currency_d2_negbra) 
-	
-	* input costs
-	qui: sum `input_costs' if  `grouping_var'==`group', det
-	local this_row = `this_row' + 1
-	qui: putexcel `this_col_str'`this_row'= `r(`export_what')', nformat(currency_d2_negbra) 
-	
-	* hired labour
-	qui: sum `hiredlabour_costs' if  `grouping_var'==`group', det
-	local this_row = `this_row' + 1
-	qui: putexcel `this_col_str'`this_row'= `r(`export_what')', nformat(currency_d2_negbra) 
-	
-	* total costs
-	qui: sum `all_costs' if  `grouping_var'==`group', det
-	local this_row = `this_row' + 1
-	qui: putexcel `this_col_str'`this_row'= `r(`export_what')', nformat(currency_d2_negbra) 
-	
-	* main income
-	qui: sum `total_main_income' if  `grouping_var'==`group' , det
-	local this_row = `this_row' + 1
-	qui: putexcel `this_col_str'`this_row'= `r(`export_what')', nformat(currency_d2_negbra) 
-	
-	* Living income title
-	local this_row = `this_row' + 1
-	qui: putexcel `this_col_str'`this_row',  overwritefmt font(Calibri, 11, white) bold fpattern(solid,  "91 155 213") 
-	
-	* Income share
-	local this_row = `this_row' + 1
-	local p1 = `this_row'-2
-	local p2 = `this_row'+1
-	qui: putexcel `this_col_str'`this_row'= formula(`this_col_str'`p1'/`this_col_str'`p2'), nformat(percent) 
-	
-	* total income
-	qui: sum `total_hh_income' if  `grouping_var'==`group', det
-	local this_row = `this_row' + 1
-	qui: putexcel `this_col_str'`this_row'= `r(`export_what')', nformat(currency_d2_negbra) 
-	
-	* LI benchmark
-	qui: sum `li_benchmark' if  `grouping_var'==`group', det
-	local this_row = `this_row' + 1 
-	qui: putexcel `this_col_str'`this_row'= `r(`export_what')', nformat(currency_d2_negbra) 
-	
-	* LI GAP
-	local this_row = `this_row' + 1
-	local p1 = `this_row'-2
-	local p2 = `this_row'-1
-	qui: putexcel `this_col_str'`this_row'= formula(1-`this_col_str'`p1'/`this_col_str'`p2'), nformat(percent) 
-	
-	* household size
-	qui: sum `hh_size' if   `grouping_var'==`group', det
-	local this_row = `this_row' + 2
-	qui: putexcel `this_col_str'`this_row'= `r(`export_what')', nformat(number_d2 ) 
-	
-	* sample size 
-	local this_row = `this_row' + 2
-	qui: putexcel `this_col_str'`this_row'= `r(N)',  nformat(number) 
-	
-	***
-	local this_col = `this_col' + 1
+		* Productivity
+		local this_row = `this_row' + 1
+		local p1 = `this_row'+2
+		local p2 = `this_row'+1
+		qui: putexcel `this_col_str'`this_row'= formula(`this_col_str'`p1'/`this_col_str'`p2'), nformat(number_sep) 
+			
+		* Farm size
+		qui: sum `productive_farm' if  `grouping_var'==`group', det
+		local this_row = `this_row' + 1
+		qui: putexcel `this_col_str'`this_row'= `r(`export_what')', nformat(0.0) 
+			
+		* Total Production 
+		qui: sum `total_production' if  `grouping_var'==`group', det
+		local this_row = `this_row' + 1
+		qui: putexcel `this_col_str'`this_row'= `r(`export_what')', nformat(number_sep) 
+				
+		* Price
+		qui: sum `price' if  `grouping_var'==`group', det
+		local this_row = `this_row' + 1 
+		qui: putexcel `this_col_str'`this_row'= `r(`export_what')', nformat(currency_d2_negbra) 
+		
+		* Value of prod
+		qui: sum `revenue_total' if  `grouping_var'==`group', det
+		local this_row = `this_row' + 1
+		qui: putexcel `this_col_str'`this_row'= `r(`export_what')', nformat(currency_d2_negbra) 
+		
+		* input costs
+		qui: sum `input_costs' if  `grouping_var'==`group', det
+		local this_row = `this_row' + 1
+		qui: putexcel `this_col_str'`this_row'= `r(`export_what')', nformat(currency_d2_negbra) 
+		
+		* hired labour
+		qui: sum `hiredlabour_costs' if  `grouping_var'==`group', det
+		local this_row = `this_row' + 1
+		qui: putexcel `this_col_str'`this_row'= `r(`export_what')', nformat(currency_d2_negbra) 
+		
+		* total costs
+		qui: sum `all_costs' if  `grouping_var'==`group', det
+		local this_row = `this_row' + 1
+		qui: putexcel `this_col_str'`this_row'= `r(`export_what')', nformat(currency_d2_negbra) 
+		
+		* main income
+		qui: sum `total_main_income' if  `grouping_var'==`group' , det
+		local this_row = `this_row' + 1
+		qui: putexcel `this_col_str'`this_row'= `r(`export_what')', nformat(currency_d2_negbra) 
+		
+		* Living income title
+		local this_row = `this_row' + 1
+		qui: putexcel `this_col_str'`this_row',  overwritefmt font(Calibri, 11, white) bold fpattern(solid,  "91 155 213") 
+		
+		* Income share
+		local this_row = `this_row' + 1
+		local p1 = `this_row'-2
+		local p2 = `this_row'+1
+		qui: putexcel `this_col_str'`this_row'= formula(`this_col_str'`p1'/`this_col_str'`p2'), nformat(percent) 
+		
+		* total income
+		qui: sum `total_hh_income' if  `grouping_var'==`group', det
+		local this_row = `this_row' + 1
+		qui: putexcel `this_col_str'`this_row'= `r(`export_what')', nformat(currency_d2_negbra) 
+		
+		* LI benchmark
+		qui: sum `li_benchmark' if  `grouping_var'==`group', det
+		local this_row = `this_row' + 1 
+		qui: putexcel `this_col_str'`this_row'= `r(`export_what')', nformat(currency_d2_negbra) 
+		
+		* LI GAP
+		local this_row = `this_row' + 1
+		local p1 = `this_row'-2
+		local p2 = `this_row'-1
+		qui: putexcel `this_col_str'`this_row'= formula(1-`this_col_str'`p1'/`this_col_str'`p2'), nformat(percent) 
+		
+		* household size
+		qui: sum `hh_size' if   `grouping_var'==`group', det
+		local this_row = `this_row' + 2
+		qui: putexcel `this_col_str'`this_row'= `r(`export_what')', nformat(number_d2 ) 
+		
+		* sample size 
+		local this_row = `this_row' + 2
+		qui: putexcel `this_col_str'`this_row'= `r(N)',  nformat(number) 
+		
+		***
+		local this_col = `this_col' + 1
 
+	}
+	
+	restore
 }
 
 putexcel close
 putexcel clear
 
-restore
+
 
 
