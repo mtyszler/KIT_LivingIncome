@@ -182,9 +182,6 @@ if "`grouping_var'" !="" {
 	local this_row = `this_row' + 2
 	qui: putexcel `this_col_str'`this_row'= "Sample size", font(Calibri, 11, white) bold fpattern(solid,  "91 155 213") 
 
-	* sample size 
-	local this_row = `this_row' + 1
-	qui: putexcel `this_col_str'`this_row'= "N"
 
 
 **** Export content for all
