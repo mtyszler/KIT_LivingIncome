@@ -83,6 +83,18 @@ local grouping_var = "grouping"
  * load file
  use `ds_filename', replace
  
+****************************
+* TEMP this needs to be removed later
+gen benchmark_cluster = .
+replace benchmark_cluster = 4742 if grouping == 1
+replace benchmark_cluster = 5123 if grouping == 2
+replace benchmark_cluster = 4001 if grouping == 3
+
+by society_grp2, sort: egen li_benchmark = mean(benchmark_cluster)
+* END OF Temp
+*****************************************
+
+ 
 ** Prep excel file:
 capture putexcel close
 capture putexcel clear
