@@ -1,4 +1,4 @@
-# Living Income Benchmark Update
+# Living Income Calculation tools
 ## Developed by [KIT](http://www.kit.nl) and [COSA](http://thecosa.org/)
 [Last update 31/10/2019] 
 
