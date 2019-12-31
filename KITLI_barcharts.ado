@@ -31,247 +31,192 @@ Last Update:
 
 *****************************************************************************/
 
-
-***** TO BE ADJUSTED BY THE USER ********/
-** As a user you need to adjust these values:
-
-
-* Dataset:
-local ds_filename = "data_cleaned_LI.dta"
-
-* Sub-folder where the graphs will be saved:
-*==> Notice the trailing "/"
-* If no subfolder is required, replace the local by an empty string, ""
-local sf = "Bar_Charts/"
-*local sf = "" // uncomment for no subfolder
-
-
-* Variables for which plots need to be created
-* The plots will use the variable labels, therefore make sure these are clear and complete
-
-* This the income variables to which the comparison will apply
-local total_main_income = "total_income_2018" // total income from main source, for example main crop sales
-local total_hh_income = "total_hh_income_2018" // total household income
-
-* Set labels for the graphs:
-local currency = "USD"
-local label_main_income = "Income from main crop"
-local label_remaining_income = "Other income"
-
-* Values of the benchmark, per group, with increasing integer numbers in the order they appear:
-* At least 1 benchmark is needed, if no grouping takes place
-local li_benchmark_1 = 4742
-local li_benchmark_2 = 5123
-local li_benchmark_3 = 4001
-
-** Intrinsice value of food
-local food = 450 // include intrinsice value of food to be reduced from the gap
-*local food = "" // uncomment to skip the food graph
-
-* Grouping variable, replace by an empty string for no groupings
-* The plots will use the group labels, therefore make sure these are clear and complete
-local grouping_var = "grouping"
-*local grouping_var = "" // uncomment for no groups
-
-** Color for the groups:
-* we preset 4 colors, add more if needed, with increasing integer numbers:
-* %30 refers to 30% transparency
-local color_main = "blue%30" // main source of income
-local color_remaining = "ebblue%30" // remaining income
-local color_gap = "red%80" // gap_color
-local color_food = "orange%30" // intrinsic value of food
-
-
-***** END OF TO BE ADJUSTED BY THE USER ********
-
-***** TO BE ADJUSTED ONLY BY ADVANCED USERS ********/
-** As a user you should not modify the rows below.
-** Only do so, if you are confident on what you are doing. 
- 
- 
- 
- * load file
- use `ds_filename', replace
- 
- * create sub-folder if not existent:
- capture mkdir "`sf'"
- 
- preserve
- 
- * Identify groups:
- if "`grouping_var'" !="" {
+version 15.1 
+capture program drop KITLI_barcharts
+program define KITLI_barcharts, sortpreserve
+	syntax varname(numeric) [if] [in], ///
+	total_main_income(varname numeric) ///
+	total_hh_income (varname numeric) ///
+	[grouping_var(varname numeric) ///
+	label_currency(string) ///
+	label_main_income(string) ///
+	label_remaining_income(string) /// 
+	color_main(string) ///
+	color_remaining(string) ///
+	color_gap(string) ///
+	color_food(string) ///
+	subfolder(string) ///
+	median ///
+	as_share /// 
+	food(numlist >0 max = 1) ///
+	nosave]
 	
-	levelsof `grouping_var', local(group_levels)
-	drop if `grouping_var' == .
-	 
- }
- 
-
-*** Prepare graph of gap to the MEAN INCOME 
-capture drop gap* benchmark
-if "`grouping_var'" !="" {
-
-	by `grouping_var', sort: egen temp_gap_cocoa = mean(`total_main_income')
-	by `grouping_var', sort: egen temp_gap_total = mean(`total_hh_income')
 	
-	local this_over = ", over(`grouping_var')"
-}
-else {
-	egen temp_gap_cocoa = mean(`total_main_income')
-	egen temp_gap_total = mean(`total_hh_income')
-	
-	local this_over = ", "
-}
+	** mark if and in
+	marksample touse, novarlist
 
-gen temp_benchmark = .
-if "`grouping_var'" !="" {
-	local counter = 1
-	foreach group in `group_levels' {
+
+	** rename varlist:
+	local li_benchmark = "`varlist'"
 	
-		replace  temp_benchmark = `li_benchmark_`counter'' if `grouping_var' == `group'
-		local counter = `counter'+1
-		
+	** load defaults in case optional arguments are skipped:	
+	capture confirm existence `label_currency'
+	if _rc == 6 {
+		local label_currency = "USD"
 	}
-} 
-else {
-	replace temp_benchmark = `li_benchmark_1'
-}
-
-gen temp_gap_benchmark = temp_benchmark - temp_gap_total
-replace temp_gap_total = temp_gap_total - temp_gap_cocoa
-
- 
-graph bar (mean) temp_gap_cocoa temp_gap_total  temp_gap_benchmark `this_over' ///
-stack legend(label(1 "`label_main_income'") label(2 "`label_remaining_income'") label(3 "Gap to the Living Income Benchmark")) ///
-ytitle("`currency'/year/household")  ///
-bar(1, color(`color_main')) ///
-bar(2, color(`color_remaining')) ///
-bar(3, color(`color_gap')) ///
-blabel(bar, format(%9.0f) position(center) ) ///
-graphregion(color(white)) bgcolor(white) ///
-title("Mean values")
- 
-graph export "`sf'`var'bar_LI_gap_mean.png", width(1000) replace
-
-gen temp_gap_benchmark_share = temp_gap_benchmark/temp_benchmark*100
-gen temp_gap_total_share = temp_gap_total/temp_benchmark*100
-gen temp_gap_cocoa_share = temp_gap_cocoa/temp_benchmark*100
- 
-graph bar (mean) temp_gap_cocoa_share temp_gap_total_share  temp_gap_benchmark_share `this_over' ///
-stack legend(label(1 "`label_main_income'") label(2 "`label_remaining_income'") label(3 "Gap to the Living Income Benchmark")) ///
-ytitle("% of the benchmark value")  ///
-bar(1, color(`color_main')) ///
-bar(2, color(`color_remaining')) ///
-bar(3, color(`color_gap')) ///
-blabel(bar, format(%9.0f) position(center) ) ///
-graphregion(color(white)) bgcolor(white) ///
-title("Mean values in relation to the benchmark value")
- 
-graph export "`sf'`var'bar_LI_gap_mean_as_share.png", width(1000) replace 
- 
- 
-** MEAN, ncluding value of food 
-if "`food'" !="" {
-	gen temp_food = `food'
-	replace temp_gap_benchmark =  temp_gap_benchmark - temp_food
-	 
-	graph bar (mean) temp_gap_cocoa temp_gap_total  temp_food temp_gap_benchmark `this_over' ///
-	stack legend(label(1 "`label_main_income'") label(2 "`label_remaining_income'") label(3 "Value of crops consumed at home") label(4 "Gap to the Living Income Benchmark") size(vsmall)) ///
-	ytitle("`currency'/year/household")  ///
-	bar(1, color(`color_main')) ///
-	bar(2, color(`color_remaining')) ///
-	bar(4, color(`color_gap')) ///
-	bar(3, color(`color_food')) ///
-	blabel(bar, format(%9.0f) position(center) ) ///
-	graphregion(color(white)) bgcolor(white) ///
-	title("Mean values")
-	 
-	
-	 
-	graph export "`sf'`var'bar_LI_gap_FOOD_mean.png", width(1000) replace
-	
-	gen temp_food_share =  temp_food/temp_benchmark*100
-	replace temp_gap_benchmark_share =  temp_gap_benchmark_share - temp_food_share
-	 
-	graph bar (mean) temp_gap_cocoa_share temp_gap_total_share  temp_food_share temp_gap_benchmark_share `this_over' ///
-	stack legend(label(1 "`label_main_income'") label(2 "`label_remaining_income'") label(3 "Value of crops consumed at home") label(4 "Gap to the Living Income Benchmark") size(vsmall)) ///
-	ytitle("% of the benchmark value")  ///
-	bar(1, color(`color_main')) ///
-	bar(2, color(`color_remaining')) ///
-	bar(4, color(`color_gap')) ///
-	bar(3, color(`color_food')) ///
-	blabel(bar, format(%9.0f) position(center) ) ///
-	graphregion(color(white)) bgcolor(white) ///
-	title("Mean values in relation to the benchmark value")
-	 
-	
-	 
-	graph export "`sf'`var'bar_LI_gap_FOOD_mean_as_share.png", width(1000) replace
-}
-
-
-*** Prepare graph of gap to the MEDIAN INCOME 
-capture drop temp_gap* temp_benchmark
-if "`grouping_var'" !="" {
-
-	by `grouping_var', sort: egen temp_gap_cocoa = median(`total_main_income')
-	by `grouping_var', sort: egen temp_gap_total = median(`total_hh_income')
-	
-	local this_over = ", over(`grouping_var')"
-}
-else {
-	egen temp_gap_cocoa = median(`total_main_income')
-	egen temp_gap_total = median(`total_hh_income')
-	
-	local this_over = ", "
-}
-
-gen temp_benchmark = .
-if "`grouping_var'" !="" {
-	local counter = 1
-	foreach group in `group_levels' {
-	
-		replace  temp_benchmark = `li_benchmark_`counter'' if `grouping_var' == `group'
-		local counter = `counter'+1
-		
+	capture confirm existence `label_main_income'
+	if _rc == 6 {
+		local label_main_income = "Income from main crop"
 	}
-} 
-else {
-	replace temp_benchmark = `li_benchmark_1'
-}
+	capture confirm existence `label_remaining_income'
+	if _rc == 6 {
+		local label_remaining_income = "Other income"
+	}
+	capture confirm existence `color_main'
+	if _rc == 6 {
+		local color_main = "blue%30"
+	}
+	capture confirm existence `color_remaining'
+	if _rc == 6 {
+		local color_remaining = "ebblue%30"
+	}
+	capture confirm existence `color_gap'
+	if _rc == 6 {
+		local color_gap = "red%80"
+	}
+	capture confirm existence `color_food'
+	if _rc == 6 {
+		local color_food = "orange%30"
+	}
 
-gen temp_gap_benchmark = temp_benchmark - temp_gap_total
-replace temp_gap_total = temp_gap_total - temp_gap_cocoa
+	
+	*** create tempvars & temp names
+	tempvar temp_gap_main temp_gap_total temp_gap_benchmark temp_benchmark temp_food
+  
+	* create sub-folder if not existent:
+	if "`subfolder'" != "" {
+		if ustrright("`subfolder'", 1) != "\" {
+			local subfolder = "`subfolder'" + "\"
+		}
+		capture mkdir "`subfolder'"
+	}
+	 	
+	** Prepare values for the graphs
+	if "`median'" == "median" {
 
- 
-graph bar (mean) temp_gap_cocoa temp_gap_total  temp_gap_benchmark `this_over' ///
-stack legend(label(1 "`label_main_income'") label(2 "`label_remaining_income'") label(3 "Gap to the Living Income Benchmark")) ///
-ytitle("`currency'/year/household")  ///
-bar(1, color(`color_main')) ///
-bar(2, color(`color_remaining')) ///
-bar(3, color(`color_gap')) ///
-blabel(bar, format(%9.0f) position(center) ) ///
-graphregion(color(white)) bgcolor(white) ///
-title("Median values")
- 
-graph export "`sf'`var'bar_LI_gap_median.png", width(1000) replace
+		*** Prepare gap to the MEDIAN INCOME
+		
+		if "`grouping_var'" !="" {
 
-gen temp_gap_benchmark_share = temp_gap_benchmark/temp_benchmark*100
-gen temp_gap_total_share = temp_gap_total/temp_benchmark*100
-gen temp_gap_cocoa_share = temp_gap_cocoa/temp_benchmark*100
- 
-graph bar (mean) temp_gap_cocoa_share temp_gap_total_share  temp_gap_benchmark_share `this_over' ///
-stack legend(label(1 "`label_main_income'") label(2 "`label_remaining_income'") label(3 "Gap to the Living Income Benchmark")) ///
-ytitle("% of the benchmark value")  ///
-bar(1, color(`color_main')) ///
-bar(2, color(`color_remaining')) ///
-bar(3, color(`color_gap')) ///
-blabel(bar, format(%9.0f) position(center) ) ///
-graphregion(color(white)) bgcolor(white) ///
-title("Median values in relation to the benchmark value")
- 
-graph export "`sf'`var'bar_LI_gap_median_as_share.png", width(1000) replace 
- 
- 
+			qui: by `grouping_var', sort: egen `temp_gap_main' = median(`total_main_income')
+			qui: by `grouping_var', sort: egen `temp_gap_total' = median(`total_hh_income')
+			qui: by `grouping_var', sort: egen `temp_benchmark' = median(`li_benchmark')
+			
+			local this_over = ", over(`grouping_var')"
+		}
+		else {
+			qui: egen `temp_gap_main' = median(`total_main_income')
+			qui: egen `temp_gap_total' = median(`total_hh_income')
+			qui: egen `temp_benchmark' = median(`li_benchmark')
+			
+			local this_over = ", "
+		}
 
-restore
+		local this_title = "Median values"
+		local this_filename = "`subfolder'bar_LI_gap_median"
+	
+	
+	
+	} 
+	else {
+	
+		*** Prepare gap to the MEAN INCOME
+		
+		if "`grouping_var'" !="" {
+
+			qui: by `grouping_var', sort: egen `temp_gap_main' = mean(`total_main_income')
+			qui: by `grouping_var', sort: egen `temp_gap_total' = mean(`total_hh_income')
+			qui: by `grouping_var', sort: egen `temp_benchmark' = mean(`li_benchmark')
+			
+			local this_over = ", over(`grouping_var')"
+		}
+		else {
+			qui: egen `temp_gap_main' = mean(`total_main_income')
+			qui: egen `temp_gap_total' = mean(`total_hh_income')
+			qui: egen `temp_benchmark' = mean(`li_benchmark')
+			
+			local this_over = ", "
+		}
+
+		
+		local this_title = "Mean values"
+		local this_filename = "`subfolder'bar_LI_gap_mean"
+	}
+	 
+	qui: gen `temp_gap_benchmark' = `temp_benchmark' - `temp_gap_total'
+	qui: replace `temp_gap_total' = `temp_gap_total' - `temp_gap_main' 
+	 
+	local this_ytitle =  "`label_currency'/year/household"
+	
+	* Adjustments if share
+	if "`as_share'" == "as_share" {
+		qui: replace `temp_gap_benchmark' = `temp_gap_benchmark'/`temp_benchmark'*100
+		qui: replace `temp_gap_total' = `temp_gap_total'/`temp_benchmark'*100
+		qui: replace `temp_gap_main' = `temp_gap_main'/`temp_benchmark'*100
+		
+		local this_title = "`this_title'" + " in relation to the benchmark value"
+		local this_filename = "`this_filename'" + "_as_share"
+		local this_ytitle =  "% of the benchmark value"
+	}
+	
+	 
+	
+	
+	** Check for Food specification
+	if "`food'" !="" {
+		qui: gen `temp_food' = `food'
+		local this_filename = "`this_filename'" + "_with_food"
+		
+		if "`as_share'" == "as_share" {
+			qui: replace `temp_food' =  `temp_food'/`temp_benchmark'*100
+			qui: replace `temp_gap_benchmark' = `temp_gap_benchmark' - `temp_food'
+		}
+		
+		qui: replace `temp_gap_benchmark' =  `temp_gap_benchmark' - `temp_food'
+
+		graph bar (mean) `temp_gap_main' `temp_gap_total' `temp_food' `temp_gap_benchmark' `this_over' ///
+		stack legend(label(1 "`label_main_income'") label(2 "`label_remaining_income'") label(3 "Value of crops consumed at home") label(4 "Gap to the Living Income Benchmark") size(vsmall)) ///
+		ytitle("`this_ytitle'")  ///
+		bar(1, color(`color_main')) ///
+		bar(2, color(`color_remaining')) ///
+		bar(4, color(`color_gap')) ///
+		bar(3, color(`color_food')) ///
+		blabel(bar, format(%9.0f) position(center) ) ///
+		graphregion(color(white)) bgcolor(white) ///
+		title("`this_title'")
+
+
+	}
+	else {
+	
+		* Generate graph
+		graph bar (mean) `temp_gap_main' `temp_gap_total'  `temp_gap_benchmark' `this_over' ///
+		stack legend(label(1 "`label_main_income'") label(2 "`label_remaining_income'") label(3 "Gap to the Living Income Benchmark")) ///
+		ytitle("`this_ytitle'")  ///
+		bar(1, color(`color_main')) ///
+		bar(2, color(`color_remaining')) ///
+		bar(3, color(`color_gap')) ///
+		blabel(bar, format(%9.0f) position(center) ) ///
+		graphregion(color(white)) bgcolor(white) ///
+		title("`this_title'")
+		 
+	}
+	
+	* save graph
+	if "`save'" != "nosave" {
+		graph export "`this_filename'.png", width(1000) replace
+	}
+	
+
+
+end
