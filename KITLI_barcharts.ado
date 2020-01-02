@@ -108,16 +108,16 @@ program define KITLI_barcharts, sortpreserve
 		
 		if "`grouping_var'" !="" {
 
-			qui: by `grouping_var', sort: egen `temp_gap_main' = median(`total_main_income')
-			qui: by `grouping_var', sort: egen `temp_gap_total' = median(`total_hh_income')
-			qui: by `grouping_var', sort: egen `temp_benchmark' = median(`li_benchmark')
+			qui: by `grouping_var', sort: egen `temp_gap_main' = median(`total_main_income') if `touse'
+			qui: by `grouping_var', sort: egen `temp_gap_total' = median(`total_hh_income') if `touse'
+			qui: by `grouping_var', sort: egen `temp_benchmark' = median(`li_benchmark') if `touse'
 			
 			local this_over = ", over(`grouping_var')"
 		}
 		else {
-			qui: egen `temp_gap_main' = median(`total_main_income')
-			qui: egen `temp_gap_total' = median(`total_hh_income')
-			qui: egen `temp_benchmark' = median(`li_benchmark')
+			qui: egen `temp_gap_main' = median(`total_main_income') if `touse'
+			qui: egen `temp_gap_total' = median(`total_hh_income') if `touse'
+			qui: egen `temp_benchmark' = median(`li_benchmark') if `touse'
 			
 			local this_over = ", "
 		}
@@ -134,16 +134,16 @@ program define KITLI_barcharts, sortpreserve
 		
 		if "`grouping_var'" !="" {
 
-			qui: by `grouping_var', sort: egen `temp_gap_main' = mean(`total_main_income')
-			qui: by `grouping_var', sort: egen `temp_gap_total' = mean(`total_hh_income')
-			qui: by `grouping_var', sort: egen `temp_benchmark' = mean(`li_benchmark')
+			qui: by `grouping_var', sort: egen `temp_gap_main' = mean(`total_main_income') if `touse'
+			qui: by `grouping_var', sort: egen `temp_gap_total' = mean(`total_hh_income') if `touse'
+			qui: by `grouping_var', sort: egen `temp_benchmark' = mean(`li_benchmark') if `touse'
 			
 			local this_over = ", over(`grouping_var')"
 		}
 		else {
-			qui: egen `temp_gap_main' = mean(`total_main_income')
-			qui: egen `temp_gap_total' = mean(`total_hh_income')
-			qui: egen `temp_benchmark' = mean(`li_benchmark')
+			qui: egen `temp_gap_main' = mean(`total_main_income') if `touse'
+			qui: egen `temp_gap_total' = mean(`total_hh_income') if `touse'
+			qui: egen `temp_benchmark' = mean(`li_benchmark') if `touse'
 			
 			local this_over = ", "
 		}
@@ -153,16 +153,16 @@ program define KITLI_barcharts, sortpreserve
 		local this_filename = "`subfolder'bar_LI_gap_mean"
 	}
 	 
-	qui: gen `temp_gap_benchmark' = `temp_benchmark' - `temp_gap_total'
-	qui: replace `temp_gap_total' = `temp_gap_total' - `temp_gap_main' 
+	qui: gen `temp_gap_benchmark' = `temp_benchmark' - `temp_gap_total' if `touse'
+	qui: replace `temp_gap_total' = `temp_gap_total' - `temp_gap_main' if `touse'
 	 
 	local this_ytitle =  "`label_currency'/year/household"
 	
 	* Adjustments if share
 	if "`as_share'" == "as_share" {
-		qui: replace `temp_gap_benchmark' = `temp_gap_benchmark'/`temp_benchmark'*100
-		qui: replace `temp_gap_total' = `temp_gap_total'/`temp_benchmark'*100
-		qui: replace `temp_gap_main' = `temp_gap_main'/`temp_benchmark'*100
+		qui: replace `temp_gap_benchmark' = `temp_gap_benchmark'/`temp_benchmark'*100 if `touse'
+		qui: replace `temp_gap_total' = `temp_gap_total'/`temp_benchmark'*100 if `touse'
+		qui: replace `temp_gap_main' = `temp_gap_main'/`temp_benchmark'*100 if `touse'
 		
 		local this_title = "`this_title'" + " in relation to the benchmark value"
 		local this_filename = "`this_filename'" + "_as_share"
@@ -174,17 +174,17 @@ program define KITLI_barcharts, sortpreserve
 	
 	** Check for Food specification
 	if "`food'" !="" {
-		qui: gen `temp_food' = `food'
+		qui: gen `temp_food' = `food' if `touse'
 		local this_filename = "`this_filename'" + "_with_food"
 		
 		if "`as_share'" == "as_share" {
-			qui: replace `temp_food' =  `temp_food'/`temp_benchmark'*100
-			qui: replace `temp_gap_benchmark' = `temp_gap_benchmark' - `temp_food'
+			qui: replace `temp_food' =  `temp_food'/`temp_benchmark'*100 if `touse'
+			qui: replace `temp_gap_benchmark' = `temp_gap_benchmark' - `temp_food' if `touse'
 		}
 		
-		qui: replace `temp_gap_benchmark' =  `temp_gap_benchmark' - `temp_food'
+		qui: replace `temp_gap_benchmark' =  `temp_gap_benchmark' - `temp_food' if `touse'
 
-		graph bar (mean) `temp_gap_main' `temp_gap_total' `temp_food' `temp_gap_benchmark' `this_over' ///
+		graph bar (mean) `temp_gap_main' `temp_gap_total' `temp_food' `temp_gap_benchmark' if `to_use' `this_over' ///
 		stack legend(label(1 "`label_main_income'") label(2 "`label_remaining_income'") label(3 "Value of crops consumed at home") label(4 "Gap to the Living Income Benchmark") size(vsmall)) ///
 		ytitle("`this_ytitle'")  ///
 		bar(1, color(`color_main')) ///
@@ -200,7 +200,7 @@ program define KITLI_barcharts, sortpreserve
 	else {
 	
 		* Generate graph
-		graph bar (mean) `temp_gap_main' `temp_gap_total'  `temp_gap_benchmark' `this_over' ///
+		graph bar (mean) `temp_gap_main' `temp_gap_total'  `temp_gap_benchmark' if `to_use'  `this_over' ///
 		stack legend(label(1 "`label_main_income'") label(2 "`label_remaining_income'") label(3 "Gap to the Living Income Benchmark")) ///
 		ytitle("`this_ytitle'")  ///
 		bar(1, color(`color_main')) ///
