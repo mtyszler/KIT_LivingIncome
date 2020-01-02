@@ -90,7 +90,7 @@ program define KITLI_barcharts, sortpreserve
 	}
 
 	
-	*** create tempvars & temp names
+	*** create tempvars
 	tempvar temp_gap_main temp_gap_total temp_gap_benchmark temp_benchmark temp_food
   
 	* create sub-folder if not existent:
