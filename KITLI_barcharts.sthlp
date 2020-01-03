@@ -32,7 +32,7 @@
 
 {syntab: (Optional) Grouping}
 
-{synopt :{opth grouping_var:(varname)}} grouping variable. {p_end}
+{synopt :{opth grouping_var:(varname)}} grouping variable {p_end}
 
 
 {syntab: Graph labels}

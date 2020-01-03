@@ -36,7 +36,7 @@ capture program drop KITLI_barcharts
 program define KITLI_barcharts, sortpreserve
 	syntax varname(numeric) [if] [in], ///
 	total_main_income(varname numeric) ///
-	total_hh_income (varname numeric) ///
+	total_hh_income(varname numeric) ///
 	[grouping_var(varname numeric) ///
 	label_currency(string) ///
 	label_main_income(string) ///
