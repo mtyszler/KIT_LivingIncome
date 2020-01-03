@@ -126,7 +126,7 @@
 {dlgtab: File exporting}
 
 {pmore}
-{opth filename:(text)} (full) name of the excel file to be exported, including existing subfolders if desired. {cmd: Please be aware the excel file will have it contents overwritten}. {p_end}
+{opth filename:(text)} (full) name of the excel file to be exported, including existing subfolders if desire. If you use subfolder, please use "/" as separator. {cmd: Please be aware the excel file will have it contents overwritten}. {p_end}
 
 {pmore}{opth wsheet:(text)} worksheet name within the excel file to receive the exports. It will be created if not existent. If it exists, content will be overwritten, but not cleared elsewhere. {p_end}
 

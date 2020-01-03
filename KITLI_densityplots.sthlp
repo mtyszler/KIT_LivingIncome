@@ -87,7 +87,7 @@ It allows to force hard edges to the smoothened distribution.
 {cmd:nosave} does not save the generated graph (default behavior is to save). Graph name will start with the variable name followed by "_density_plot". {p_end}
 
 {pmore}
-{opth subfolder:(text)} (relative) subfolder to save the graph. Default is the current folder. Please make sure name is correct includes "/" as appropriate. Folder will be created if necessary. {p_end}
+{opth subfolder:(text)} (relative) subfolder to save the graph. Default is the current folder. Please make sure name is correct includes "/" as separator if needed. Folder will be created if necessary. {p_end}
 
 
 {title:Examples}

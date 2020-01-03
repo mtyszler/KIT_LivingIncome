@@ -141,7 +141,7 @@ for the intrinsic value of food crops produced and consumed at home.
 {cmd:nosave} does not save the generated graph (default behavior is to save). Graph name will start with "bar_LI_gap" and will be followed by "mean" or "median", and include "as_share" and/or "food" as applicable. {p_end}
 
 {pmore}
-{opth subfolder:(text)} (relative) subfolder to save the graph. Default is the current folder. Please make sure name is correct includes "/" as appropriate. Folder will be created if necessary. {p_end}
+{opth subfolder:(text)} (relative) subfolder to save the graph. Default is the current folder. Please make sure name is correct and includes "/" as separator if needed. Folder will be created if necessary. {p_end}
 
 
 {title:Examples}

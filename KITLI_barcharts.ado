@@ -95,8 +95,8 @@ program define KITLI_barcharts, sortpreserve
   
 	* create sub-folder if not existent:
 	if "`subfolder'" != "" {
-		if ustrright("`subfolder'", 1) != "\" {
-			local subfolder = "`subfolder'" + "\"
+		if ustrright("`subfolder'", 1) != "/" {
+			local subfolder = "`subfolder'" + "/"
 		}
 		capture mkdir "`subfolder'"
 	}

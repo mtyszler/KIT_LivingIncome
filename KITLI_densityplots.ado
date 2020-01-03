@@ -64,8 +64,8 @@ program define KITLI_densityplots, sortpreserve
  
 	* create sub-folder if not existent:
 	if "`subfolder'" != "" {
-		if ustrright("`subfolder'", 1) != "\" {
-			local subfolder = "`subfolder'" + "\"
+		if ustrright("`subfolder'", 1) != "/" {
+			local subfolder = "`subfolder'" + "/"
 		}
 		capture mkdir "`subfolder'"
 	}
@@ -147,11 +147,11 @@ program define KITLI_densityplots, sortpreserve
 		local Note = `"`Note' "bin size = `w_2'""'
 		
 		local current_max = 0
+		local all_colors = "`colors'"
+		local all_hard_min = "`hard_min'"
+		local all_hard_max = "`hard_max'"
 		** Compute kernels of each group
 		if "`grouping_var'" !="" {
-			local all_colors = "`colors'"
-			local all_hard_min = "`hard_min'"
-			local all_hard_max = "`hard_max'"
 			local group_graph = ""
 			local counter = 1
 			foreach group in `group_levels' {
