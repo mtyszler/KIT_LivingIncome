@@ -44,7 +44,7 @@
 {title:Description}
 
 {pstd}
-{cmd: KITLI_densityplots} produces density ({help kdensity:kernel smoothened}) plots as fractions about the distribution of underlying variables for the indication of the household income, optionally.  
+{cmd: KITLI_densityplots} produces density ({help kdensity:kernel smoothened}) plots as fractions about the distribution of underlying variables for the indication of the household income, optionally by groups.  
 
 {pstd}
 It allows to force hard edges to the smoothened distribution.
