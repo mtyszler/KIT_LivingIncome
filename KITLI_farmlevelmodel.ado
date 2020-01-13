@@ -1,14 +1,14 @@
 /*****************************************************************************
 LIVING INCOME CALCULATIONS AND OUTPUTS
 
-This stata do-file produces an excel output with a farm level profit model for a single main crop.
+This stata ado-file produces an excel output with a farm level profit model for a single main crop.
 
 It produces tables similar to what can be seen at:
 https://www.kit.nl/wp-content/uploads/2019/01/Analysis-of-the-income.pdf
 https://docs.wixstatic.com/ugd/0c5ab3_93560a9b816d40c3a28daaa686e972a5.pdf
 
 It assumes variables have already been calculated. 
-If not, please check do-files:
+If not, please check do-files: KITLI_incomecalculations.ado
 
 ---------------------------------------------------------------------------
 

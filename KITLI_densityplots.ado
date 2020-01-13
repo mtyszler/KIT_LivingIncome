@@ -1,7 +1,7 @@
 /*****************************************************************************
 LIVING INCOME CALCULATIONS AND OUTPUTS
 
-This stata do-file produces density (kernel smoothened) plots as fractions about 
+This stata ado-file produces density (kernel smoothened) plots as fractions about 
 the distribution of underlying variables for the indication of the household income.
 
 It produces graphs similar to what can be seen at:
@@ -10,7 +10,7 @@ https://docs.wixstatic.com/ugd/0c5ab3_93560a9b816d40c3a28daaa686e972a5.pdf
 
 
 It assumes variables have already been calculated. 
-If not, please check do-files:
+If not, please check do-files: KITLI_incomecalculations.ado
 
 ---------------------------------------------------------------------------
 
