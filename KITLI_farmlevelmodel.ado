@@ -21,11 +21,11 @@ ISEAL, Living Income Community of Practice and GIZ
 You are free to use it and modify for your needs. BUT PLEASE CITE US:
 
 Tyszler, et al. (2019). Living Income Calculations Toolbox. KIT ROYAL TROPICAL 
-INSTITUTE and COSA. Available at: 
+INSTITUTE and COSA. Available at: https://bitbucket.org/kitimpactteam/living-income-calculations/
 
 -----------------------------------------------------------------------------
 Last Update:
-4/11/2019
+13/01/2020
 
 *****************************************************************************/
 
