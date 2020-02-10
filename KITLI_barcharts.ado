@@ -184,7 +184,7 @@ program define KITLI_barcharts, sortpreserve
 		
 		qui: replace `temp_gap_benchmark' =  `temp_gap_benchmark' - `temp_food' if `touse'
 
-		graph bar (mean) `temp_gap_main' `temp_gap_total' `temp_food' `temp_gap_benchmark' if `to_use' `this_over' ///
+		graph bar (mean) `temp_gap_main' `temp_gap_total' `temp_food' `temp_gap_benchmark' if `touse' `this_over' ///
 		stack legend(label(1 "`label_main_income'") label(2 "`label_remaining_income'") label(3 "Value of crops consumed at home") label(4 "Gap to the Living Income Benchmark") size(vsmall)) ///
 		ytitle("`this_ytitle'")  ///
 		bar(1, color(`color_main')) ///
@@ -200,7 +200,7 @@ program define KITLI_barcharts, sortpreserve
 	else {
 	
 		* Generate graph
-		graph bar (mean) `temp_gap_main' `temp_gap_total'  `temp_gap_benchmark' if `to_use'  `this_over' ///
+		graph bar (mean) `temp_gap_main' `temp_gap_total'  `temp_gap_benchmark' if `touse'  `this_over' ///
 		stack legend(label(1 "`label_main_income'") label(2 "`label_remaining_income'") label(3 "Gap to the Living Income Benchmark")) ///
 		ytitle("`this_ytitle'")  ///
 		bar(1, color(`color_main')) ///
