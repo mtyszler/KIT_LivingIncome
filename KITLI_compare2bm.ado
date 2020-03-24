@@ -88,6 +88,11 @@ program define KITLI_compare2bm, sortpreserve
 
 	* Define bin size and steps for the density calculation
 	qui: sum `var' if `touse'
+
+	if `r(N)' == 0 {
+		error 2000 // no observations
+	}
+
 	if r(max) < =  2 {
 		local w = 0.1
 	} 
