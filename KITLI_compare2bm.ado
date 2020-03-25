@@ -232,8 +232,7 @@ program define KITLI_compare2bm, sortpreserve
 		local counter = 1
 		foreach group in `group_levels' {
 			local group_label: label (`grouping_var') `group'
-			
-			qui: sum `var' if  grouping == `group' & `touse', det
+			qui: sum `var' if  `grouping_var' == `group' & `touse', det
 			local Note = "N = `r(N)'"
 			local Note = "`Note', bin size = `w_2'"
 			local this_mean = `r(mean)'
