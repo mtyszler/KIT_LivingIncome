@@ -281,8 +281,8 @@ program define KITLI_compare2bm, sortpreserve
 		qui: gen `temp_order_height_counter' = .
 		foreach group in `group_levels' {
 
-			replace `temp_order_height' =  `li_benchmark_`counter'' in `counter'
-			replace `temp_order_height_counter' =  `counter' in `counter'
+			qui: replace `temp_order_height' =  `li_benchmark_`counter'' in `counter'
+			qui: replace `temp_order_height_counter' =  `counter' in `counter'
 			local counter = `counter'+1
 			
 		}
