@@ -23,6 +23,9 @@ You are free to use it and modify for your needs. BUT PLEASE CITE US:
 Tyszler, et al. (2019). Living Income Calculations Toolbox. KIT ROYAL TROPICAL 
 INSTITUTE and COSA. Available at: https://bitbucket.org/kitimpactteam/living-income-calculations/
 
+This work is licensed under the Creative Commons Attribution-ShareAlike 4.0 International License. 
+To view a copy of this license, visit http://creativecommons.org/licenses/by-sa/4.0/.
+
 -----------------------------------------------------------------------------
 Last Update:
 17/04/2020
