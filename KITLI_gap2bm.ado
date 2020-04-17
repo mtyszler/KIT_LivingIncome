@@ -1,16 +1,14 @@
 /*****************************************************************************
 LIVING INCOME CALCULATIONS AND OUTPUTS
 
-This stata ado-file produces bar charts of the Gap to the Living Income Benchmark
-It assumes that there are two main sources of income.
+This stata ado-file produces tables and bar charts of the Gap to the Living Income Benchmark
 
 It produces graphs similar to what can be seen at:
 https://www.kit.nl/wp-content/uploads/2019/01/Analysis-of-the-income.pdf
 https://docs.wixstatic.com/ugd/0c5ab3_93560a9b816d40c3a28daaa686e972a5.pdf
 
-
-It assumes variables have already been calculated. 
-If not, please check do-files: KITLI_incomecalculations.ado
+It assumes that key variables have already been calculated. Type
+help KITLI_gap2bm for more details
 
 ---------------------------------------------------------------------------
 
@@ -27,7 +25,7 @@ INSTITUTE and COSA. Available at: https://bitbucket.org/kitimpactteam/living-inc
 
 -----------------------------------------------------------------------------
 Last Update:
-13/01/2020
+17/04/2020
 
 *****************************************************************************/
 
