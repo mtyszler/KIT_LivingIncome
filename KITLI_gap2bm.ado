@@ -55,21 +55,22 @@ program define KITLI_gap2bm, sortpreserve
 	food(numlist >0 max = 1)]
 	
 	
-	** mark if and in
+
+	********************************************
+	** Prepare observations which will be used 
 	marksample touse, novarlist
 
-
-	** rename varlist:
-	local li_benchmark = "`varlist'"
-
-
-	** check for valid inputs:
+	
+	********************************************
+	** check for valid combination of inputs:
 	if "`label_main_income'" !="" & "`total_main_income'" == ""   {
 		display as error "ERROR: {it:label_main_income} can only be used if {it:total_main_income} is also provided."
 		error 184
 		exit
 	}
 	
+
+	********************************************
 	** load defaults in case optional arguments are skipped:	
 	capture confirm existence `metric'
 	if _rc == 6 {
@@ -117,25 +118,33 @@ program define KITLI_gap2bm, sortpreserve
 		local color_food = "orange%30"
 	}
 
+
+	********************************************
 	** check for valid inputs
 	if "`metric'" != "mean" & "`metric'" != "median" & "`metric'" != "FGT"  {
-		display as error "metric can only be one of  {it:mean, median, FGT}"
+		display as error "ERROR: metric can only be one of  {it:mean, median, FGT}"
 		error 198
 		exit
 	}
 
 
-	** check for valid inputs
+	** check for valid combination of inputs
 	if "`metric'" == "FGT" & "`as_share'" == "as_share"   {
-		display as error "{it:FGT} cannot be combined with {it:as_share} "
+		display as error "ERROR: {it:FGT} cannot be combined with {it:as_share} "
 		error 184
 		exit
 	}
 
-	
+
+
+
+	********************************************
 	*** create tempvars
 	tempvar temp_gap_main temp_gap_total temp_gap_benchmark temp_benchmark temp_food
   
+
+  	** rename key variable:
+	local li_benchmark = "`varlist'"
  	
 	** Prepare calculations
 	if "`metric'" == "median" {
