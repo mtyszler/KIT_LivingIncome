@@ -268,7 +268,6 @@ program define KITLI_gap2bm, sortpreserve
 	** Check for Food specification
 	if "`food'" !="" {
 		qui: gen `temp_food' = `food' if `touse'
-		local this_filename = "`this_filename'" + "_with_food"
 		
 		if "`as_share'" == "as_share" {
 			qui: replace `temp_food' =  `temp_food'/`temp_benchmark'*100 if `touse'
