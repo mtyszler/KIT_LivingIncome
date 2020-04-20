@@ -65,7 +65,7 @@ program define KITLI_gap2bm, sortpreserve
 
 	** check for valid inputs:
 	if "`label_main_income'" !="" & "`total_main_income'" == ""   {
-		display as error "WARNING {it:label_main_income} can only be used if {it:total_main_income} is also provided. It will be ignored."
+		display as error "ERROR: {it:label_main_income} can only be used if {it:total_main_income} is also provided."
 		error 184
 		exit
 	}
