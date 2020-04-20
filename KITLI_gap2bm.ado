@@ -36,22 +36,26 @@ version 15.1
 capture program drop KITLI_gap2bm
 program define KITLI_gap2bm, sortpreserve
 	syntax varname(numeric) [if] [in], ///
-	total_hh_income(varname numeric) ///
-	[total_main_income(varname numeric) ///
+	hh_income(varname numeric) ///
+	[main_income(varname numeric) ///
+	food_value(varname numeric) ///
 	metric(string) ///
 	grouping_var(varname numeric) ///
 	label_currency(string) ///
 	label_time(string) ///
+	label_hh_income(string) /// 
 	label_main_income(string) ///
-	label_remaining_income(string) /// 
-	color_main(string) ///
-	color_remaining(string) ///
+	label_other_than_main_income(string) /// 
+	label_food_value(string) /// 
+	color_hh_income(string) ///
+	color_main_income(string) ///
+	color_other_than_main_income(string) ///
 	color_gap(string) ///
-	color_food(string) ///
+	color_food_value(string) ///
 	show_graph ///
 	save_as(string) ///
-	as_share /// 
-	food(numlist >0 max = 1)]
+	as_share ///
+	]
 	
 	
 
@@ -59,15 +63,50 @@ program define KITLI_gap2bm, sortpreserve
 	** Prepare observations which will be used 
 	marksample touse, novarlist
 
-	
+
 	********************************************
 	** check for valid combination of inputs:
-	if "`label_main_income'" !="" & "`total_main_income'" == ""   {
-		display as error "ERROR: {it:label_main_income} can only be used if {it:total_main_income} is also provided."
+
+	* main income matching elements
+	if "`label_main_income'" !="" & "`main_income'" == ""   {
+		display as error "ERROR: {it:label_main_income} can only be used if {it:main_income} is also provided."
 		error 184
 		exit
 	}
 	
+	if "`color_main_income'" !="" & "`main_income'" == ""   {
+		display as error "ERROR: {it:color_main_income} can only be used if {it:main_income} is also provided."
+		error 184
+		exit
+	}
+
+	if "`label_other_than_main_income'" !="" & "`main_income'" == ""   {
+		display as error "ERROR: {it:label_other_than_main_income} can only be used if {it:main_income} is also provided."
+		error 184
+		exit
+	}
+
+	if "`color_other_than_main_income'" !="" & "`main_income'" == ""   {
+		display as error "ERROR: {it:color_other_than_main_income} can only be used if {it:main_income} is also provided."
+		error 184
+		exit
+	}
+
+
+	* label and color for hh income can only be provided if no main income is provided
+	if "`label_hh_income'" !="" & "`main_income'" != ""   {
+		display as error "ERROR: {it:label_income} can only be used if {it:main_income} is NOT provided."
+		error 184
+		exit
+	}
+
+	if "`color_hh_income'" !="" & "`main_income'" != ""   {
+		display as error "ERROR: {it:color_hh_income} can only be used if {it:main_income} is NOT provided."
+		error 184
+		exit
+	}
+
+
 
 	********************************************
 	** load defaults in case optional arguments are skipped:	
@@ -83,34 +122,41 @@ program define KITLI_gap2bm, sortpreserve
 	if _rc == 6 {
 		local label_time = "year"
 	}
-	capture confirm existence `label_remaining_income'
+	capture confirm existence `label_other_than_main_income'
 	if _rc == 6 {
-		if "`total_main_income'" =="" {
-			local label_remaining_income = "Total income"
-		} 
-		else {
-			local label_remaining_income = "Other income"
-		}
+		local label_other_than_main_income = "Other income"
+	}
+	capture confirm existence `label_hh_income'
+	if _rc == 6 {
+		local label_hh_income = "Total income"
 	}
 	capture confirm existence `label_main_income'
 	if _rc == 6 {
 		local label_main_income = "Income from main crop"
 	}
-	capture confirm existence `color_main'
+	capture confirm existence `label_food_value'
 	if _rc == 6 {
-		local color_main = "blue%30"
+		local label_food_value = "Value of crops consumed at home"
 	}
-	capture confirm existence `color_remaining'
+	capture confirm existence `color_hh_income'
 	if _rc == 6 {
-		local color_remaining = "ebblue%30"
+		local color_hh_income = "blue%30"
+	}
+	capture confirm existence `color_main_income'
+	if _rc == 6 {
+		local color_main_income = "blue%30"
+	}
+	capture confirm existence `color_other_than_main_income'
+	if _rc == 6 {
+		local color_other_than_main_income = "ebblue%30"
 	}
 	capture confirm existence `color_gap'
 	if _rc == 6 {
 		local color_gap = "red%80"
 	}
-	capture confirm existence `color_food'
+	capture confirm existence `color_food_value'
 	if _rc == 6 {
-		local color_food = "orange%30"
+		local color_food_value = "orange%30"
 	}
 
 
@@ -130,84 +176,116 @@ program define KITLI_gap2bm, sortpreserve
 		exit
 	}
 
-
+	** check for valid combination of inputs
+	if "`metric'" == "FGT" & "`main_income'" != ""   {
+		display as error "ERROR: {it:FGT} cannot be combined with {it:main_income} "
+		error 184
+		exit
+	}
 
 
 	********************************************
+	** compose base ytitle for graphs and tables
+	local this_ytitle =  "`label_currency'/`label_time'/household"
+	local benchmark_unit =  "`this_ytitle'"
+
+	********************************************
 	*** create tempvars
-	tempvar temp_gap_main temp_gap_total temp_gap_benchmark temp_benchmark temp_food
-  
+	* key components
+	tempvar temp_totalincome temp_mainincome temp_foodvalue temp_benchmark
+	
+	* gap components
+	tempvar temp_gap2benchmark 
+	tempvar temp_other_than_main 
 
   	** rename key variable:
-	local li_benchmark = "`varlist'"
- 	
-	** Prepare calculations
+	local li_benchmark = "`varlist'" 	
+
+ 	********************************************
+	** Prepare calculations: median, mean or FGT
+
 	if "`metric'" == "median" {
 
 		*** Prepare gap to the MEDIAN INCOME
-		local text_tbl = "Gap of the median income to the Living Income Benchmark"
-		
+
 		if "`grouping_var'" !="" {
-			if "`total_main_income'" != "" {
-				qui: by `grouping_var', sort: egen `temp_gap_main' = median(`total_main_income') if `touse'
+			if "`main_income'" != "" {
+				qui: by `grouping_var', sort: egen `temp_mainincome' = median(`main_income') if `touse'
 			}
-			qui: by `grouping_var', sort: egen `temp_gap_total' = median(`total_hh_income') if `touse'
+			if "`food_value'" !="" {
+				qui: by `grouping_var', sort: egen `temp_foodvalue' = median(`food_value') if `touse'
+			}		
+			qui: by `grouping_var', sort: egen `temp_totalincome' = median(`hh_income') if `touse'
 			qui: by `grouping_var', sort: egen `temp_benchmark' = median(`li_benchmark') if `touse'
 			
 			local this_over = ", over(`grouping_var')"
 		}
 		else {
-			if "`total_main_income'" != "" {
-				qui: egen `temp_gap_main' = median(`total_main_income') if `touse'
+			if "`main_income'" != "" {
+				qui: egen `temp_mainincome' = median(`main_income') if `touse'
 			}
-			qui: egen `temp_gap_total' = median(`total_hh_income') if `touse'
+			if "`food_value'" !="" {
+				qui: egen `temp_foodvalue' = median(`food_value') if `touse'
+			}
+			qui: egen `temp_totalincome' = median(`hh_income') if `touse'
 			qui: egen `temp_benchmark' = median(`li_benchmark') if `touse'
 			
 			local this_over = ", "
 		}
 
+		* Elements for the tables:
+		local text_tbl = "Gap of the median income to the Living Income Benchmark"
+
+		* Elements for the graphs
 		local this_title = "Median values"
-	
-	
+		
 	} 
-	else if "`metric'" == "mean" {{
+
+	else if "`metric'" == "mean" {
 	
 		*** Prepare gap to the MEAN INCOME
-		local text_tbl = "Gap of the average income to the Living Income Benchmark"
-		
+
 		if "`grouping_var'" !="" {
 
-			if "`total_main_income'" != "" {
-				qui: by `grouping_var', sort: egen `temp_gap_main' = mean(`total_main_income') if `touse'
+			if "`main_income'" != "" {
+				qui: by `grouping_var', sort: egen `temp_mainincome' = mean(`main_income') if `touse' & `main_income' !=.
 			}
-			qui: by `grouping_var', sort: egen `temp_gap_total' = mean(`total_hh_income') if `touse'
-			qui: by `grouping_var', sort: egen `temp_benchmark' = mean(`li_benchmark') if `touse'
+			if "`food_value'" !="" {
+				qui: by `grouping_var', sort: egen `temp_foodvalue' = mean(`food_value') if `touse' & `food_value' !=.
+			}
+			qui: by `grouping_var', sort: egen `temp_totalincome' = mean(`hh_income') if `touse' & `hh_income' !=.
+			qui: by `grouping_var', sort: egen `temp_benchmark' = mean(`li_benchmark') if `touse' & `li_benchmark' !=.
 			
 			local this_over = ", over(`grouping_var')"
 		}
 		else {
-			if "`total_main_income'" != "" {
-				qui: egen `temp_gap_main' = mean(`total_main_income') if `touse'
+			if "`main_income'" != "" {
+				qui: egen `temp_mainincome' = mean(`main_income') if `touse' & `main_income' !=.
 			}
-			qui: egen `temp_gap_total' = mean(`total_hh_income') if `touse'
-			qui: egen `temp_benchmark' = mean(`li_benchmark') if `touse'
+			if "`food_value'" !="" {
+				qui: egen `temp_foodvalue' = mean(`food_value') if `touse' & `food_value' !=.
+			}
+			qui: egen `temp_totalincome' = mean(`hh_income') if `touse' & `hh_income' !=.
+			qui: egen `temp_benchmark' = mean(`li_benchmark') if `touse' & `li_benchmark' !=.
 			
 			local this_over = ", "
 		}
 
-		
+		* Elements for the tables:
+		local text_tbl = "Gap of the average income to the Living Income Benchmark"
+
+		* Elements for the graphs
 		local this_title = "Mean values"
 	}
 
 	else if "`metric'" == "FGT" {
 	
-		*** Prepare FGT metric
-		local text_tbl = "FGT gap to the Living Income Benchmark"
-
-		if "`total_main_income'" != "" {
-			qui: gen `temp_gap_main' = `total_main_income' if `touse'
+		*** Prepare FGT metric (no means nor median)
+		
+		if "`food_value'" != "" {
+			qui: gen `temp_foodvalue' = `food_value' if `touse'
 		}
-		qui: gen `temp_gap_total' = `total_hh_income' if `touse'
+		qui: gen `temp_totalincome' = `hh_income' if `touse'
 		qui: gen `temp_benchmark' = `li_benchmark' if `touse'
 					
 		if "`grouping_var'" !="" {
@@ -219,219 +297,326 @@ program define KITLI_gap2bm, sortpreserve
 			local this_over = ", "
 		}
 
-		
+		* Elements for the tables:
+		local text_tbl = "FGT gap to the Living Income Benchmark"
+
+		* Elements for the graphs
 		local this_title = "FGT index"
 	}
 	 
-	qui: gen `temp_gap_benchmark' = `temp_benchmark' - `temp_gap_total' if `touse'
-	if "`total_main_income'" != "" {
-		qui: replace `temp_gap_total' = `temp_gap_total' - `temp_gap_main' if `touse'
-	}
-	 
-	local this_ytitle =  "`label_currency'/`label_time'/household"
+
+	********************************************
+	** Compute gap and other elements
+	qui: gen `temp_gap2benchmark' = `temp_benchmark' - `temp_totalincome' if `touse'
 	
-	* Adjustments if share
+	if "`main_income'" != "" {
+		qui: gen `temp_other_than_main' = `temp_totalincome' - `temp_mainincome' if `touse'
+	}
+	if "`food_value'" != "" {
+		qui: replace `temp_gap2benchmark' = `temp_gap2benchmark' - `temp_foodvalue' if `touse'
+	} 
+	
+	* Elements for the tables:
+	local show_pct = " "
+
+	** Adjustments if share
 	if "`as_share'" == "as_share" {
-		qui: replace `temp_gap_benchmark' = `temp_gap_benchmark'/`temp_benchmark'*100 if `touse'
-		qui: replace `temp_gap_total' = `temp_gap_total'/`temp_benchmark'*100 if `touse'
-		if "`total_main_income'" != "" {
-			qui: replace `temp_gap_main' = `temp_gap_main'/`temp_benchmark'*100 if `touse'
+		qui: replace `temp_gap2benchmark' = `temp_gap2benchmark'/`temp_benchmark'*100 if `touse'
+		if "`main_income'" != "" {
+			qui: replace `temp_mainincome' = `temp_mainincome'/`temp_benchmark'*100 if `touse'
+			qui: replace `temp_other_than_main' = `temp_other_than_main'/`temp_benchmark'*100 if `touse'
+		} 
+		else {
+			qui: replace `temp_totalincome' = `temp_totalincome'/`temp_benchmark'*100 if `touse'
 		}
-		
+
+		if "`food_value'" != "" {
+			qui: replace `temp_foodvalue' =  `temp_foodvalue'/`temp_benchmark'*100 if `touse'
+		}
+
+		* Elements for the tables:
+		local show_pct = "%"
+
+		* Elements for the graphs
 		local this_title = "`this_title'" + " in relation to the benchmark value"
 		local this_ytitle =  "% of the benchmark value"
 		local this_ylabel = " ylabel(0(10)100, grid)"
 	}
 
-	* Adjustments FGT:
+	* Adjustments for FGT:
 	if "`metric'" == "FGT" {
+		qui: replace `temp_gap2benchmark' = 0 if `touse' & `temp_gap2benchmark' <0 & `temp_gap2benchmark' !=.
+		qui: replace `temp_gap2benchmark' = `temp_gap2benchmark'/`temp_benchmark'*100 if `touse'
+
+		* Elements for the graphs
 		local this_ytitle =  "Index value"
-
-		qui: replace `temp_gap_benchmark' = 0 if `touse' & `temp_gap_benchmark' <0 & `temp_gap_benchmark' !=.
-
-		qui: replace `temp_gap_benchmark' = `temp_gap_benchmark'/`temp_benchmark'*100 if `touse'
-		qui: drop `temp_gap_total' 
-		if "`total_main_income'" != "" {
-			qui: drop `temp_gap_main' 
-		}
 		local this_ylabel = " ylabel(0(10)100, grid)"
 	}
 	
-	 
+	 	
+	********************************************
+	* display table with results
+
+	display in b _newline
+	display in b "`text_tbl'" 
+
+	if "`grouping_var'" !="" { // show per group, than total
+
+		qui: levelsof `grouping_var' if `touse', local(group_levels)
+
+		** per groups
+		foreach group in `group_levels' {
+
+			local group_label: label (`grouping_var') `group'
 	
-	
-	** Check for Food specification
-	if "`food'" !="" {
-		qui: gen `temp_food' = `food' if `touse'
-		
-		if "`as_share'" == "as_share" {
-			qui: replace `temp_food' =  `temp_food'/`temp_benchmark'*100 if `touse'
-			qui: replace `temp_gap_benchmark' = `temp_gap_benchmark' - `temp_food' if `touse'
-		}
-		
-		qui: replace `temp_gap_benchmark' =  `temp_gap_benchmark' - `temp_food' if `touse'
-
-		if "`show_graph'" !="" {
-			graph bar (mean) `temp_gap_main' `temp_gap_total' `temp_food' `temp_gap_benchmark' if `touse' `this_over' ///
-			stack legend(label(1 "`label_main_income'") label(2 "`label_remaining_income'") label(3 "Value of crops consumed at home") label(4 "Gap to the Living Income Benchmark") size(vsmall)) ///
-			ytitle("`this_ytitle'")  ///
-			bar(1, color(`color_main')) ///
-			bar(2, color(`color_remaining')) ///
-			bar(4, color(`color_gap')) ///
-			bar(3, color(`color_food')) ///
-			blabel(bar, format(%9.0f) position(center) ) ///
-			graphregion(color(white)) bgcolor(white) ///
-			title("`this_title'")
-		}
-
-
-	}
-	else {
-
-		* display some results
-		if "`as_share'" == "as_share" {
-			local show_pct = "%"
-		} 
-		else {
-			local show_pct = " "
-		}
-
-		display in b _newline
-		display in b "`text_tbl'" 
-
-
-		if "`grouping_var'" !="" {
-
-			qui: levelsof `grouping_var' if `touse', local(group_levels)
-
-			foreach group in `group_levels' {
-
-				local group_label: label (`grouping_var') `group'
-		
-				qui: sum `temp_benchmark' if `grouping_var' == `group' & `touse' 
-				display in b ""
-				display in b "`group_label'" 
-				display in b "n = `r(N)'"
-				di as text "{hline 73}"
-				
-				if "`metric'" != "FGT" {
-					if "`total_main_income'" != "" {
-						qui: sum `temp_gap_main' if `grouping_var' == `group' & `touse' 
-						display as text %35s "`label_main_income':" /*
-										*/ as result /*
-										*/ %9.0f `r(mean)' "`show_pct'"
-					}
-					qui: sum `temp_gap_total' if `grouping_var' == `group' & `touse' 
-					display as text %35s "`label_remaining_income':" /*
+			qui: sum `temp_gap2benchmark' if `grouping_var' == `group' & `touse' 
+			display in b ""
+			display in b "`group_label'" 
+			display in b "n = `r(N)'"
+			display in b ""
+			display as text %35s "" as text "`this_ytitle'"
+			di as text "{hline 73}"
+			
+			if "`metric'" != "FGT" { // mean of median
+				if "`main_income'" != "" {
+					qui: sum `temp_mainincome' if `grouping_var' == `group' & `touse' 
+					display as text %35s "`label_main_income':" /*
 									*/ as result /*
 									*/ %9.0f `r(mean)' "`show_pct'"
-					qui: sum `temp_gap_benchmark' if `grouping_var' == `group' & `touse' 
-					display as text %35s "Gap to the Living Income Benchmark:" /*
+
+					qui: sum `temp_other_than_main' if `grouping_var' == `group' & `touse' 
+					display as text %35s "`label_other_than_main_income':" /*
 									*/ as result /*
 									*/ %9.0f `r(mean)' "`show_pct'"
 				}
 				else {
-					qui: sum `temp_gap_benchmark' if `grouping_var' == `group' & `touse' 
-					display as text %35s "FGT index:" /*
+					qui: sum `temp_totalincome' if `grouping_var' == `group' & `touse' 
+					display as text %35s "`label_hh_income':" /*
 									*/ as result /*
-									*/ %9.0f `r(mean)' "%"
-
+									*/ %9.0f `r(mean)' "`show_pct'"
 				}
-				di as text "{hline 73}"
-				qui: sum `temp_benchmark' if `grouping_var' == `group' & `touse'
-				display as text %35s "Living Income Benchmark" /*
-								*/ as result /*
-								*/ %9.0f `r(mean)' 
-			
-			}
 
-			display in b ""
-			display in b "All groups"
+				if "`food_value'" != "" {
+					qui: sum `temp_foodvalue' if `grouping_var' == `group' & `touse' 
+					display as text %35s "`label_food_value':" /*
+									*/ as result /*
+									*/ %9.0f `r(mean)' "`show_pct'"
+				}
 
-		}
 
-		qui: sum `temp_benchmark' if `touse'
-		display in b "n = `r(N)'"
-		di as text "{hline 73}"
-		
-		if "`metric'" != "FGT" {
-			if "`total_main_income'" != "" {
-				qui: sum `temp_gap_main' if `touse' 
-				display as text %35s "`label_main_income':" /*
+				qui: sum `temp_gap2benchmark' if `grouping_var' == `group' & `touse' 
+				display as text %35s "Gap to the Living Income Benchmark:" /*
 								*/ as result /*
 								*/ %9.0f `r(mean)' "`show_pct'"
 			}
-			qui: sum `temp_gap_total' if `touse' 
-			display as text %35s "`label_remaining_income':" /*
+			else { //FGT
+				qui: sum `temp_gap2benchmark' if `grouping_var' == `group' & `touse' 
+				display as text %35s "FGT index:" /*
+								*/ as result /*
+								*/ %9.0f `r(mean)' "%"
+
+			}
+
+			di as text "{hline 73}"
+			if "`as_share'" == "as_share" | "`metric'" == "FGT" {
+				display as text %35s "" as text "`benchmark_unit'"
+			}
+			qui: sum `temp_benchmark' if `grouping_var' == `group' & `touse'
+			display as text %35s "Living Income Benchmark" /*
 							*/ as result /*
-							*/ %9.0f `r(mean)' "`show_pct'"
-			qui: sum `temp_gap_benchmark' if `touse' 
+							*/ %9.0f `r(mean)' 
+		
+		}
+
+		** all groups together
+		qui: sum `temp_gap2benchmark' if `grouping_var' != . & `touse' 
+		display in b ""
+		display in b "All groups"
+		display in b "n = `r(N)'"
+		display in b ""
+		display as text %35s "" as text "`this_ytitle'"
+		di as text "{hline 73}"
+	
+		
+		if "`metric'" != "FGT" { // mean of median
+			if "`main_income'" != "" {
+				qui: sum `temp_mainincome' if `grouping_var' != . & `touse' 
+				display as text %35s "`label_main_income':" /*
+								*/ as result /*
+								*/ %9.0f `r(mean)' "`show_pct'"
+
+				qui: sum `temp_other_than_main' if `grouping_var' != . & `touse' 
+				display as text %35s "`label_other_than_main_income':" /*
+								*/ as result /*
+								*/ %9.0f `r(mean)' "`show_pct'"
+			}
+			else {
+				qui: sum `temp_totalincome' if `grouping_var' != . & `touse' 
+				display as text %35s "`label_hh_income':" /*
+								*/ as result /*
+								*/ %9.0f `r(mean)' "`show_pct'"
+			}
+
+			if "`food_value'" != "" {
+				qui: sum `temp_foodvalue' if `grouping_var' != . & `touse' 
+				display as text %35s "`label_food_value':" /*
+								*/ as result /*
+								*/ %9.0f `r(mean)' "`show_pct'"
+			}
+
+
+			qui: sum `temp_gap2benchmark' if `grouping_var' != . & `touse' 
 			display as text %35s "Gap to the Living Income Benchmark:" /*
 							*/ as result /*
 							*/ %9.0f `r(mean)' "`show_pct'"
 		}
-		else {
-			qui: sum `temp_gap_benchmark' if `touse' 
+		else { //FGT
+			qui: sum `temp_gap2benchmark' if `grouping_var' != . & `touse' 
 			display as text %35s "FGT index:" /*
 							*/ as result /*
 							*/ %9.0f `r(mean)' "%"
 
 		}
+
 		di as text "{hline 73}"
-		qui: sum `temp_benchmark' if `touse'
+		if "`as_share'" == "as_share" | "`metric'" == "FGT"  {
+			display as text %35s "" as text "`benchmark_unit'"
+		}
+		qui: sum `temp_benchmark' if `grouping_var' != . & `touse'
 		display as text %35s "Living Income Benchmark" /*
 						*/ as result /*
 						*/ %9.0f `r(mean)' 
+
+	}
+	else { // no groups
+
+		qui: sum `temp_gap2benchmark' if  `touse' 
+		display in b ""
+		display in b "n = `r(N)'"
+		display in b ""
+		display as text %35s "" as text "`this_ytitle'"
+		di as text "{hline 73}"
 		
+		if "`metric'" != "FGT" { // mean of median
+			if "`main_income'" != "" {
+				qui: sum `temp_mainincome' if  `touse' 
+				display as text %35s "`label_main_income':" /*
+								*/ as result /*
+								*/ %9.0f `r(mean)' "`show_pct'"
 
-	
-		* Generate graph
-		if "`show_graph'" !="" {
+				qui: sum `temp_other_than_main' if `touse' 
+				display as text %35s "`label_other_than_main_income':" /*
+								*/ as result /*
+								*/ %9.0f `r(mean)' "`show_pct'"
+			}
+			else {
+				qui: sum `temp_totalincome' if  `touse' 
+				display as text %35s "`label_hh_income':" /*
+								*/ as result /*
+								*/ %9.0f `r(mean)' "`show_pct'"
+			}
 
-			if "`metric'" == "FGT" {
-				graph bar (mean)  `temp_gap_benchmark' if `touse'  `this_over' ///
-				stack legend(label(1 "FGT index")) ///
+			if "`food_value'" != "" {
+				qui: sum `temp_foodvalue' if  `touse' 
+				display as text %35s "`label_food_value':" /*
+								*/ as result /*
+								*/ %9.0f `r(mean)' "`show_pct'"
+			}
+
+
+			qui: sum `temp_gap2benchmark' if `touse' 
+			display as text %35s "Gap to the Living Income Benchmark:" /*
+							*/ as result /*
+							*/ %9.0f `r(mean)' "`show_pct'"
+		}
+		else { //FGT
+			qui: sum `temp_gap2benchmark' if `touse' 
+			display as text %35s "FGT index:" /*
+							*/ as result /*
+							*/ %9.0f `r(mean)' "%"
+
+		}
+
+		di as text "{hline 73}"
+		if "`as_share'" == "as_share" | "`metric'" == "FGT"  {
+			display as text %35s "" as text "`benchmark_unit'"
+		}
+		qui: sum `temp_benchmark' if  `touse'
+		display as text %35s "Living Income Benchmark" /*
+						*/ as result /*
+						*/ %9.0f `r(mean)' 
+	}
+
+	********************************************
+	* Generate graphs
+	if "`show_graph'" !="" {
+
+		if "`metric'" == "FGT" {
+			graph bar (mean)  `temp_gap2benchmark' if `touse'  `this_over' ///
+			stack legend(label(1 "FGT index")) ///
+			ytitle("`this_ytitle'") `this_ylabel' ///
+			bar(1, color(`color_gap')) ///
+			blabel(bar, format(%9.0f) position(center) ) ///
+			graphregion(color(white)) bgcolor(white) ///
+			title("`this_title'")
+
+		}  
+		else if "`main_income'" != "" {  
+			if "`food_value'" == "" { // no food
+				graph bar (mean) `temp_mainincome' `temp_other_than_main'  `temp_gap2benchmark' if `touse'  `this_over' ///
+				stack legend(label(1 "`label_main_income'") label(2 "`label_other_than_main_income'") label(3 "Gap to the Living Income Benchmark")) ///
 				ytitle("`this_ytitle'") `this_ylabel' ///
-				bar(1, color(`color_gap')) ///
-				blabel(bar, format(%9.0f) position(center) ) ///
-				graphregion(color(white)) bgcolor(white) ///
-				title("`this_title'")
-
-			}  
-			else if "`total_main_income'" != "" {  
-				graph bar (mean) `temp_gap_main' `temp_gap_total'  `temp_gap_benchmark' if `touse'  `this_over' ///
-				stack legend(label(1 "`label_main_income'") label(2 "`label_remaining_income'") label(3 "Gap to the Living Income Benchmark")) ///
-				ytitle("`this_ytitle'") `this_ylabel' ///
-				bar(1, color(`color_main')) ///
-				bar(2, color(`color_remaining')) ///
+				bar(1, color(`color_main_income')) ///
+				bar(2, color(`color_other_than_main_income')) ///
 				bar(3, color(`color_gap')) ///
 				blabel(bar, format(%9.0f) position(center) ) ///
 				graphregion(color(white)) bgcolor(white) ///
 				title("`this_title'")
 			}
-			else {
-				graph bar (mean) `temp_gap_total'  `temp_gap_benchmark' if `touse'  `this_over' ///
-				stack legend(label(1 "`label_remaining_income'") label(2 "Gap to the Living Income Benchmark")) ///
-				ytitle("`this_ytitle'")  `this_ylabel' ///
-				bar(1, color(`color_remaining')) ///
-				bar(2, color(`color_gap')) ///
+			else { // with food
+				graph bar (mean) `temp_mainincome' `temp_other_than_main' `temp_foodvalue' `temp_gap2benchmark' if `touse'  `this_over' ///
+				stack legend(label(1 "`label_main_income'") label(2 "`label_other_than_main_income'") label(3 "`label_food_value'") label(4 "Gap to the Living Income Benchmark") size(vsmall)) ///
+				ytitle("`this_ytitle'") `this_ylabel' ///
+				bar(1, color(`color_main_income')) ///
+				bar(2, color(`color_other_than_main_income')) ///
+				bar(4, color(`color_gap')) ///
+				bar(3, color(`color_food_value')) ///
 				blabel(bar, format(%9.0f) position(center) ) ///
 				graphregion(color(white)) bgcolor(white) ///
 				title("`this_title'")
 			}
 		}
+		else {
+			if "`food_value'" == "" { // no food
+				graph bar (mean) `temp_totalincome'  `temp_gap2benchmark' if `touse'  `this_over' ///
+				stack legend(label(1 "`label_hh_income'") label(2 "Gap to the Living Income Benchmark")) ///
+				ytitle("`this_ytitle'")  `this_ylabel' ///
+				bar(1, color(`color_hh_income')) ///
+				bar(2, color(`color_gap')) ///
+				blabel(bar, format(%9.0f) position(center) ) ///
+				graphregion(color(white)) bgcolor(white) ///
+				title("`this_title'")
+			}
+			else { // with food
+				graph bar (mean) `temp_totalincome' `temp_foodvalue' `temp_gap2benchmark' if `touse'  `this_over' ///
+				stack legend(label(1 "`label_hh_income'")  label(2 "`label_food_value'") label(3 "Gap to the Living Income Benchmark") size(vsmall)) ///
+				ytitle("`this_ytitle'") `this_ylabel' ///
+				bar(1, color(`color_hh_income')) ///
+				bar(2, color(`color_gap')) ///
+				bar(3, color(`color_food_value')) ///
+				blabel(bar, format(%9.0f) position(center) ) ///
+				graphregion(color(white)) bgcolor(white) ///
+				title("`this_title'")
+			}
+		}
+	}
 		 
-	}
 	
-	* save graph/*
-	if "`save_as'"!="" {
-		graph export "`save_as'.png", width(1000) replace
+	* save graph *
+	if "`save_as'" != "" {
+		graph export "`save_as'.png", as(png) width(1000) replace 
 	}
+
 	*/
-
-
-	
-	
-
 
 end
