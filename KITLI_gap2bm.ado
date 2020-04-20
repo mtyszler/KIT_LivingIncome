@@ -41,6 +41,8 @@ program define KITLI_gap2bm, sortpreserve
 	metric(string) ///
 	grouping_var(varname numeric) ///
 	label_currency(string) ///
+	label_time(string) ///
+	label_unit(string) ///
 	label_main_income(string) ///
 	label_remaining_income(string) /// 
 	color_main(string) ///
@@ -76,6 +78,14 @@ program define KITLI_gap2bm, sortpreserve
 	capture confirm existence `label_currency'
 	if _rc == 6 {
 		local label_currency = "USD"
+	}
+	capture confirm existence `label_time'
+	if _rc == 6 {
+		local label_currency = "year"
+	}
+	capture confirm existence `label_unit'
+	if _rc == 6 {
+		local label_currency = "household"
 	}
 	capture confirm existence `label_remaining_income'
 	if _rc == 6 {
