@@ -42,7 +42,6 @@ program define KITLI_gap2bm, sortpreserve
 	grouping_var(varname numeric) ///
 	label_currency(string) ///
 	label_time(string) ///
-	label_unit(string) ///
 	label_main_income(string) ///
 	label_remaining_income(string) /// 
 	color_main(string) ///
@@ -82,11 +81,7 @@ program define KITLI_gap2bm, sortpreserve
 	}
 	capture confirm existence `label_time'
 	if _rc == 6 {
-		local label_currency = "year"
-	}
-	capture confirm existence `label_unit'
-	if _rc == 6 {
-		local label_currency = "household"
+		local label_time = "year"
 	}
 	capture confirm existence `label_remaining_income'
 	if _rc == 6 {
@@ -233,7 +228,7 @@ program define KITLI_gap2bm, sortpreserve
 		qui: replace `temp_gap_total' = `temp_gap_total' - `temp_gap_main' if `touse'
 	}
 	 
-	local this_ytitle =  "`label_currency'/year/household"
+	local this_ytitle =  "`label_currency'/`label_time'/household"
 	
 	* Adjustments if share
 	if "`as_share'" == "as_share" {
