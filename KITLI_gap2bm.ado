@@ -288,21 +288,26 @@ program define KITLI_gap2bm, sortpreserve
 	else if "`metric'" == "FGT" {
 	
 		*** Prepare FGT metric (no means nor median)
-		
-		if "`food_value'" != "" {
-			qui: gen `temp_foodvalue' = `food_value' if `touse'
-		}
-		qui: gen `temp_totalincome' = `hh_income' if `touse'
-		qui: gen `temp_benchmark' = `li_benchmark' if `touse'
-					
+
 		if "`grouping_var'" !="" {
-			
+			if "`food_value'" != "" {
+				qui: gen `temp_foodvalue' = `food_value' if `touse' & `grouping_var' != .
+			}
+			qui: gen `temp_totalincome' = `hh_income' if `touse' & `grouping_var' != .
+			qui: gen `temp_benchmark' = `li_benchmark' if `touse' & `grouping_var' != .
+
 			local this_over = ", over(`grouping_var')"
 		}
 		else {
+			if "`food_value'" != "" {
+				qui: gen `temp_foodvalue' = `food_value' if `touse'
+			}
+			qui: gen `temp_totalincome' = `hh_income' if `touse'
+			qui: gen `temp_benchmark' = `li_benchmark' if `touse'
 
 			local this_over = ", "
 		}
+
 
 		* Elements for the tables:
 		local text_tbl = "FGT gap to the Living Income Benchmark"
