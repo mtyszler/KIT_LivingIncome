@@ -67,45 +67,54 @@ program define KITLI_gap2bm, sortpreserve
 	********************************************
 	** check for valid combination of inputs:
 
-	* main income matching elements
+	* food value matching  matching elements
+	if "`label_food_value'" !="" & "`food_value'" == ""   {
+		display as error "WARNING: {it:label_food_value} will be ignored if {it:food_value} is not provided."
+	}
+	if "`color_food_value'" !="" & "`food_value'" == ""   {
+		display as error "WARNING: {it:color_food_value} will be ignored if {it:food_value} is not provided."
+	}
+
+
+	** User needs to provide either hh_income only, or hh_income + main_income
+	** if hh_income only is provided, only label_hh_income and color_hh_income are used
+	** if hh_income + main_income is provided, only label_main_income + label_other_than_main_income and color_main_income + color_other_than_main_income are used
+
+	* hh_income only is provided:
 	if "`label_main_income'" !="" & "`main_income'" == ""   {
-		display as error "ERROR: {it:label_main_income} can only be used if {it:main_income} is also provided."
-		error 184
-		exit
+		display as error "WARNING: {it:label_main_income} will be ignored if {it:main_income} is not provided."
+	}
+	if "`label_other_than_main_income'" !="" & "`main_income'" == ""   {
+		display as error "WARNING: {it:label_other_than_main_income} will be ignored if {it:main_income} is not provided."
+	}
+	if "`color_main_income'" !="" & "`main_income'" == ""   {
+		display as error "WARNING: {it:color_main_income} will be ignored if {it:main_income} is not provided."
+	}
+	if "`color_other_than_main_income'" !="" & "`main_income'" == ""   {
+		display as error "WARNING: {it:color_other_than_main_income} will be ignored if {it:main_income} is not provided."
 	}
 	
-	if "`color_main_income'" !="" & "`main_income'" == ""   {
-		display as error "ERROR: {it:color_main_income} can only be used if {it:main_income} is also provided."
-		error 184
-		exit
-	}
 
-	if "`label_other_than_main_income'" !="" & "`main_income'" == ""   {
-		display as error "ERROR: {it:label_other_than_main_income} can only be used if {it:main_income} is also provided."
-		error 184
-		exit
-	}
-
-	if "`color_other_than_main_income'" !="" & "`main_income'" == ""   {
-		display as error "ERROR: {it:color_other_than_main_income} can only be used if {it:main_income} is also provided."
-		error 184
-		exit
-	}
-
-
-	* label and color for hh income can only be provided if no main income is provided
+	* hh_income + main_income is provided:
 	if "`label_hh_income'" !="" & "`main_income'" != ""   {
-		display as error "ERROR: {it:label_income} can only be used if {it:main_income} is NOT provided."
-		error 184
-		exit
+		display as error "WARNING: {it:label_hh_income} will be ignored if {it:main_income} is provided. Please use {it:label_main_income} and {it:label_other_than_main_income}"
 	}
-
 	if "`color_hh_income'" !="" & "`main_income'" != ""   {
-		display as error "ERROR: {it:color_hh_income} can only be used if {it:main_income} is NOT provided."
-		error 184
-		exit
+		display as error "WARNING: {it:color_hh_income} will be ignored if {it:main_income} is provided. Please use {it:color_main_income} and {it:color_other_than_main_income}"
 	}
 
+
+
+	** color can only be provided if graph is requested:
+	if "`show_graph'" == ""  & ("`color_hh_income'" !="" | "`color_main_income'" !="" | "`color_other_than_main_income'" !="" | "`color_food_value'" !="" | "`color_gap'" !="") {
+		display as error "WARNING: Graph colors will be ignored if {it:show_graph} is not requested."
+	}
+	
+
+	* Save graph can only be used if graph is requested
+	if "`save_graph_as'" !="" & "`show_graph'" == ""   {
+		display as error "WARNING: {it:save_graph_as} will be ignored if {it:show_graph} is not requested."
+	}
 
 
 	********************************************
@@ -161,7 +170,7 @@ program define KITLI_gap2bm, sortpreserve
 
 
 	********************************************
-	** check for valid inputs
+	** check for valid metrics and as_share combination
 	if "`metric'" != "mean" & "`metric'" != "median" & "`metric'" != "FGT"  {
 		display as error "ERROR: metric can only be one of  {it:mean, median, FGT}"
 		error 198
@@ -178,9 +187,7 @@ program define KITLI_gap2bm, sortpreserve
 
 	** check for valid combination of inputs
 	if "`metric'" == "FGT" & "`main_income'" != ""   {
-		display as error "ERROR: {it:FGT} cannot be combined with {it:main_income} "
-		error 184
-		exit
+		display as error "WARNING: {it:main_income} will be combined if metric is {it:FGT}"
 	}
 
 
