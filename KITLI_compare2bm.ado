@@ -25,9 +25,12 @@ You are free to use it and modify for your needs. BUT PLEASE CITE US:
 Tyszler, et al. (2019). Living Income Calculations Toolbox. KIT ROYAL TROPICAL 
 INSTITUTE and COSA. Available at: https://bitbucket.org/kitimpactteam/living-income-calculations/
 
+This work is licensed under the Creative Commons Attribution-ShareAlike 4.0 International License. 
+To view a copy of this license, visit http://creativecommons.org/licenses/by-sa/4.0/.
+
 -----------------------------------------------------------------------------
 Last Update:
-13/01/2020
+01/05/2020
 
 *****************************************************************************/
 
@@ -35,22 +38,33 @@ version 15.1
 capture program drop KITLI_compare2bm
 program define KITLI_compare2bm, sortpreserve
 	syntax varname(numeric) [if] [in], ///
-	bm_achieved(varname numeric) ///
-	total_hh_income(varname numeric) ///
+	hh_income(varname numeric) ///
 	[grouping_var(varname numeric) ///
 	ytitle(string) ///
 	spacing(real 0.02) ///
 	colors(string) ///
-	subfolder(string) ///
-	nosave]
+	show_graph ///
+	show_detailed_graph ///
+	save_graph_as(string) ///
+	]
 	
 
-	** mark if and in
+
+	********************************************
+	** Prepare observations which will be used 
 	marksample touse, novarlist
 
+	** color can only be provided if graph is requested:
+	if "`show_graph'" == ""  & "`show_detailed_graph'" == ""  & ("`colors'" !="" | "`ytitle'" !="" | `spacing' !=0.02 ) {
+		display as error "WARNING: Graph options will be ignored if neither {it:show_graph} nor {it:show_detailed_graph} are requested."
+	}
+	
 
-	** rename varlist:
-	local li_benchmark = "`varlist'"
+	* Save graph can only be used if graph is requested
+	if "`save_graph_as'" !="" & "`show_detailed_graph'" == ""  & "`show_graph'" == ""   {
+		display as error "WARNING: {it:save_graph_as} will be ignored if neither {it:show_graph} nor {it:show_detailed_graph} are requested."
+	}
+
 
 	** load defaults in case optional arguments are skipped:	
 	capture confirm existence `colors'
@@ -63,296 +77,451 @@ program define KITLI_compare2bm, sortpreserve
 		local ytitle = "Proportion of households (%)"
 	}
 
- 	*** create tempvars
-	tempvar temp_att 
- 
-	* create sub-folder if not existent:
-	if "`subfolder'" != "" {
-		if ustrright("`subfolder'", 1) != "/" {
-			local subfolder = "`subfolder'" + "/"
-		}
-		capture mkdir "`subfolder'"
+	********************************************
+     * Identify groups:
+     if "`grouping_var'" !="" {
+        
+        qui: levelsof `grouping_var' if `touse', local(group_levels)
+         
+     }
+
+
+	********************************************
+	*** create tempvars
+	** rename key variable:
+	local li_benchmark = "`varlist'" 	
+	
+	* key components
+	tempvar temp_bm_achieved 
+	if "`grouping_var'" !="" {
+		qui: gen `temp_bm_achieved' =  `hh_income' > `li_benchmark' if `touse' & `grouping_var' !=. & `hh_income' !=. & `li_benchmark'!=.
+	} 
+	else {
+		qui: gen `temp_bm_achieved' =  `hh_income' > `li_benchmark' if `touse'	& `hh_income' !=. & `li_benchmark'!=.
 	}
-	 disp "`subfolder'"
-	 
-	 * Identify groups:
-	 if "`grouping_var'" !="" {
-		
-		qui: levelsof `grouping_var' if `touse', local(group_levels)
-		 
-	 }
-	 
 
-	local var = "`total_hh_income'"
-	local this_var: variable label `var'
+	* for kernels
+	tempvar temp_att 
 
-	* Define bin size and steps for the density calculation
-	qui: sum `var' if `touse'
+	
+  	********************************************
+ 	 * Identify groups:
+	if "`grouping_var'" !="" {
+		qui: sum `hh_income' if `touse' & `grouping_var' !=.
+	} 
+	else {
+		qui: sum `hh_income' if `touse'
+	}
 
 	if `r(N)' == 0 {
 		error 2000 // no observations
 	}
 
-	if r(max) < =  2 {
-		local w = 0.1
-	} 
-	else if r(max) < = 50 {
-		local w = 1
-	} 
-	else if r(max) < = 100 {
-		local w = 10
-	}
-	else if r(max) < = 500 {
-		local w = 25
-	}
-	else if r(max) < = 1000 {
-		local w = 50
-	}
-	else if r(max) < = 2000 {
-		local w = 100
-	}
-	else if r(max) < = 5000 {
-		local w = 200
-	}
-	else {
-		local w = 1000
-	}
-	local ticks_x  = "xlabel(0(`w')`r(max)')"
+	********************************************
+	if "`show_graph'" !="" | "`show_detailed_graph'" !="" | {
 
-	* Density bin size is defined as half step of the histogram-like bin size    
-	local w_2 = `w'/2
-	local att_steps = ceil(r(max)/(`w_2')) // number of steps needed
-	egen `temp_att' = seq(), from(0) to(`att_steps') // place holder for the steps
-	qui: replace `temp_att' = . if [_n]>`att_steps'
-	qui: replace `temp_att' = `temp_att'*(`w_2') // replace for the actual value of the step
+		local Note_full = `""N (All) = `r(N)'""'
+		local labels_cmd = `"label( 1 "All") "'
 
-	** Prepare additional options to be passed to be kernel computation function
-	** for details type 
-	** help kdensity
-	local extras = "at(`temp_att') bw(`w')"
-
-
-	* Prepare global note and labels:
-	qui: sum `var'  if `touse'
-	local Note_full = `""N (All) = `r(N)'""'
-	local labels_cmd = `"label( 1 "All") "'
-
-	* Append group information:
-	if "`grouping_var'" !="" {
-		local counter = 2
-		local cmd_order = "order (1 "
-		foreach group in `group_levels' {
+		local hh_income_label: variable label `hh_income'
 		
-			qui: sum `var' if  `grouping_var' == `group' & `touse'
+		* Append group information:
+		if "`grouping_var'" !="" {
+			local counter = 2
+			local cmd_order = "order (1 "
+			foreach group in `group_levels' {
+			
+				qui: sum `hh_income' if  `grouping_var' == `group' & `touse'
 
-			local group_label: label (`grouping_var') `group'
+				local group_label: label (`grouping_var') `group'
+				
+				local Note_full= `"`Note_full' "N (`group_label') = `r(N)'""'
+				local labels_cmd = `"`labels_cmd' label( `counter' "`group_label'")"'
+				local cmd_order = "`cmd_order' `counter'"
+				local counter = `counter'+1
+				
+			}
 			
-			local Note_full= `"`Note_full' "N (`group_label') = `r(N)'""'
-			local labels_cmd = `"`labels_cmd' label( `counter' "`group_label'")"'
-			local cmd_order = "`cmd_order' `counter'"
-			local counter = `counter'+1
-			
+			local cmd_order = "`cmd_order')"
+			local labels_cmd = `"`labels_cmd' `cmd_order'"'
+		} 
+		else {
+			local labels_cmd = `"label( 1 "All") order(1)"'
 		}
-		
-		local cmd_order = "`cmd_order')"
-		local labels_cmd = `"`labels_cmd' `cmd_order'"'
-	} 
-	else {
-		local labels_cmd = `"label( 1 "All") order(1)"'
-	}
 
-	local Note_full = `"`Note_full' "bin size = `w_2'""'
+		********************************************
+		 * Prepare graph:
+		if r(max) < =  2 {
+			local w = 0.1
+		} 
+		else if r(max) < = 50 {
+			local w = 1
+		} 
+		else if r(max) < = 100 {
+			local w = 10
+		}
+		else if r(max) < = 500 {
+			local w = 25
+		}
+		else if r(max) < = 1000 {
+			local w = 50
+		}
+		else if r(max) < = 2000 {
+			local w = 100
+		}
+		else if r(max) < = 5000 {
+			local w = 200
+		}
+		else {
+			local w = 1000
+		}
+		local ticks_x  = "xlabel(0(`w')`r(max)')"
 
-	local current_max = 0
-	local all_colors = "`colors'"
-	** Compute kernels of each group
-	if "`grouping_var'" !="" {
-		local group_graph = ""
-		local counter = 1
-		foreach group in `group_levels' {
-		
-			local group_label: label (`grouping_var') `group'
+		* Density bin size is defined as half step of the histogram-like bin size    
+		local w_2 = `w'/2
+		local Note_full = `"`Note_full' "bin size = `w_2'""'
+		local att_steps = ceil(r(max)/(`w_2')) // number of steps needed
+		egen `temp_att' = seq(), from(0) to(`att_steps') // place holder for the steps
+		qui: replace `temp_att' = . if [_n]>`att_steps'
+		qui: replace `temp_att' = `temp_att'*(`w_2') // replace for the actual value of the step
+
+		** Prepare additional options to be passed to the kernel computation function
+		** for details type 
+		** help kdensity
+		local extras = "at(`temp_att') bw(`w')"
+
+		local current_max = 0
+		local all_colors = "`colors'"
+
+		** Compute kernels of each group
+		if "`grouping_var'" !="" {
+			local group_graph = ""
+			local counter = 1
+			foreach group in `group_levels' {
 			
-			capture drop temp_x_`group' temp_y_`group'	
-			capture tempvar temp_x_`group' temp_y_`group'
-			kdensity `var' if `grouping_var' == `group' & `touse', gen(`temp_x_`group'' `temp_y_`group'') nograph kernel(gaus) `extras'
-			qui: replace `temp_y_`group'' = `temp_y_`group''*`r(scale)'
-			qui: sum `temp_y_`group''
-			local current_max = max(`r(max)',`current_max')
+				local group_label: label (`grouping_var') `group'
+				
+				capture drop temp_x_`group' temp_y_`group'	
+				capture tempvar temp_x_`group' temp_y_`group'
+				kdensity `hh_income' if `grouping_var' == `group' & `touse', gen(`temp_x_`group'' `temp_y_`group'') nograph kernel(gaus) `extras'
+				qui: replace `temp_y_`group'' = `temp_y_`group''*`r(scale)'
+				qui: sum `temp_y_`group''
+				local current_max = max(`r(max)',`current_max')
 
-			gettoken this_color all_colors: all_colors, parse("|")
-			if "`this_color'" == "|" {
 				gettoken this_color all_colors: all_colors, parse("|")
+				if "`this_color'" == "|" {
+					gettoken this_color all_colors: all_colors, parse("|")
+				}
+
+				local group_graph = "`group_graph' || line `temp_y_`group'' `temp_x_`group'', color(`this_color') recast(area)"
+				local counter = `counter'+1
+			}
+		} 
+		else {
+			gettoken this_color all_colors: all_colors, parse("|")
+			local group_graph = " color(`this_color') recast(area) lcolor(black)"
+		}
+
+
+		* Compute kernel for the whole sample
+		capture drop temp_x temp_y
+		capture tempvar temp_x temp_y
+		if "`grouping_var'" !="" {
+			kdensity `hh_income' if `touse' & `grouping_var' !=., gen(`temp_x' `temp_y') nograph kernel(gaus) `extras'
+		} 
+		else {
+			qui: kdensity `hh_income' if `touse' , gen(`temp_x' `temp_y') nograph kernel(gaus) `extras'
+		}
+		qui: replace `temp_y' = `temp_y'*`r(scale)'
+		qui: sum `temp_y'
+
+		local current_max = max(`r(max)',`current_max')
+
+		local h =  round(`current_max',0.01) 
+
+
+		* ticks y
+		if `h'>0.16 {
+			local ssize = 0.05
+		} 
+		else {
+			local ssize = 0.01
+		}
+
+		local n_ticks = round(`h'/`ssize')
+		local ticks_y = `"ylabel(0 "0" "'
+		forvalues i = 1(1)`n_ticks'{
+			local t_y = `i'*`ssize'
+			local t_y_perc = round(`i'*`ssize'*100)
+			
+			local ticks_y = `"`ticks_y' `t_y' "`t_y_perc'" "'
+		}
+		local ticks_y = `"`ticks_y' )"'
+
+		local all_colors = "`colors'"
+
+
+		* Genereate detailed information and graphs:
+		if "`grouping_var'" !="" {
+			local all_colors = "`colors'"
+			local counter = 1
+			foreach group in `group_levels' {
+				local group_label: label (`grouping_var') `group'
+				qui: sum `hh_income' if  `grouping_var' == `group' & `touse', det
+				local Note = "N = `r(N)'"
+				local Note = "`Note', bin size = `w_2'"
+				local this_mean = `r(mean)'
+				local this_median = `r(p50)'
+
+				qui: sum `temp_bm_achieved' if `grouping_var' == `group' & `touse'
+				local share_li = round((`r(mean)')*100,0.1)
+				local share_li_`counter' = ustrleft(string(`share_li'),4) + "%"
+
+				qui: sum `li_benchmark' if `grouping_var' == `group' & `touse'
+				local li_benchmark_`counter' = round(`r(mean)',1)
+
+				if "`show_detailed_graph'" !="" | {
+
+					gettoken this_color all_colors: all_colors, parse("|")
+					if "`this_color'" == "|" {
+						gettoken this_color all_colors: all_colors, parse("|")
+					}
+					
+					capture graph drop "detailed_`counter'"
+					line `temp_y_`group'' `temp_x_`group'', color(`this_color') recast(area) ///
+					ytitle("`ytitle'") `ticks_x' `ticks_y'  xlabel(, labsize(small)) note("`Note'") graphregion(color(white)) ///
+					legend(label( 1 "`group_label'") label(2 "Living Income Benchmark") label(3 "mean") label(4 "median"))  || ///
+					pci 0 `li_benchmark_`counter'' `h' `li_benchmark_`counter'', color(red) || ///
+					pci 0 `this_mean' `h' `this_mean', color(blue) || ///
+					pci 0 `this_median' `h' `this_median', color(green) ///
+					xtitle("`hh_income_label'") ///
+					text(`h' `li_benchmark_`counter'' "`share_li_`counter'' above the benchmark", place(right)) ///
+					name("detailed_`counter'")
+					
+					if "`save_graph_as'" != "" {
+						graph export "`save_graph_as' detailed `group_label'.png", as(png) width(1000) replace 
+					}
+				}
+
+
+				local counter = `counter'+1
 			}
 
-			local group_graph = "`group_graph' || line `temp_y_`group'' `temp_x_`group'', color(`this_color') recast(area)"
-			local counter = `counter'+1
-		}
-	} 
-	else {
-		gettoken this_color all_colors: all_colors, parse("|")
-		local group_graph = " color(`this_color') recast(area) lcolor(black)"
-	}
-
-
-	* Compute kernel for the whole sample
-	capture drop temp_x temp_y
-	capture tempvar temp_x temp_y
-	kdensity `var' if `touse' , gen(`temp_x' `temp_y') nograph kernel(gaus) `extras'
-	qui: replace `temp_y' = `temp_y'*`r(scale)'
-	qui: sum `temp_y'
-
-	local current_max = max(`r(max)',`current_max')
-
-	local h =  round(`current_max',0.01) 
-
-
-	* ticks y
-	if `h'>0.16 {
-		local ssize = 0.05
-	} 
-	else {
-		local ssize = 0.01
-	}
-
-	local n_ticks = round(`h'/`ssize')
-	local ticks_y = `"ylabel(0 "0" "'
-	forvalues i = 1(1)`n_ticks'{
-		local t_y = `i'*`ssize'
-		local t_y_perc = round(`i'*`ssize'*100)
-		
-		local ticks_y = `"`ticks_y' `t_y' "`t_y_perc'" "'
-	}
-	local ticks_y = `"`ticks_y' )"'
-
-	local all_colors = "`colors'"
-	* Genereate graphs per group:
-	if "`grouping_var'" !="" {
-		local all_colors = "`colors'"
-		local counter = 1
-		foreach group in `group_levels' {
-			local group_label: label (`grouping_var') `group'
-			qui: sum `var' if  `grouping_var' == `group' & `touse', det
+			qui: sum `hh_income' if  `touse' & `grouping_var' !=. , det
 			local Note = "N = `r(N)'"
 			local Note = "`Note', bin size = `w_2'"
 			local this_mean = `r(mean)'
 			local this_median = `r(p50)'
 
-			qui: sum `bm_achieved' if `grouping_var' == `group' & `touse'
+			qui: sum `temp_bm_achieved' if  `touse' & `grouping_var' !=.
 			local share_li = round((`r(mean)')*100,0.1)
 			local share_li_`counter' = ustrleft(string(`share_li'),4) + "%"
 
-			qui: sum `li_benchmark' if `grouping_var' == `group' & `touse'
+			qui: sum `li_benchmark' if  `touse'  & `grouping_var' !=.
 			local li_benchmark_`counter' = round(`r(mean)',1)
 
-			gettoken this_color all_colors: all_colors, parse("|")
-			if "`this_color'" == "|" {
-				gettoken this_color all_colors: all_colors, parse("|")
-			}
-			
-			line `temp_y_`group'' `temp_x_`group'', color(`this_color') recast(area) ///
-			ytitle("`ytitle'") `ticks_x' `ticks_y'  xlabel(, labsize(small)) note("`Note'") graphregion(color(white)) ///
-			legend(label( 1 "`group_label'") label(2 "Living Income Benchmark") label(3 "mean") label(4 "median"))  || ///
-			pci 0 `li_benchmark_`counter'' `h' `li_benchmark_`counter'', color(red) || ///
-			pci 0 `this_mean' `h' `this_mean', color(blue) || ///
-			pci 0 `this_median' `h' `this_median', color(green) ///
-			xtitle("`this_var'") ///
-			text(`h' `li_benchmark_`counter'' "`share_li_`counter'' above the benchmark", place(right))
-			
-			if "`save'" != "nosave" {
-				graph export "`subfolder'`var'_living_income_bechmark `group_label'.png", width(1000) replace
-			}
+			if "`show_detailed_graph'" !="" | {
 
-			local counter = `counter'+1
-		}
-	}
-	else {
-		qui: sum `li_benchmark' if  `touse'
-		local li_benchmark_1 = round(`r(mean)',1)
-	}
-
-
-	** All together
-	** Decide on the heights, ordering by benchmark value:
-	if "`grouping_var'" !="" {
-		tempvar temp_order_height temp_order_height_counter current_sort
-		local counter = 1
-		qui: gen `temp_order_height' = .
-		qui: gen `temp_order_height_counter' = .
-		foreach group in `group_levels' {
-
-			qui: replace `temp_order_height' =  `li_benchmark_`counter'' in `counter'
-			qui: replace `temp_order_height_counter' =  `counter' in `counter'
-			local counter = `counter'+1
-			
-		}
-
-		gen `current_sort' = [_n]
-		sort `temp_order_height'
-
-		local counter = 1
-		foreach group in `group_levels' {
-
-			if `counter' == 1 {
-				local this_counter = `temp_order_height_counter'[`counter']
-				local h_`this_counter'  = `h'
-
-			} 
-			else {
-				local this_counter = `temp_order_height_counter'[`counter']
-				local previous_counter = `temp_order_height_counter'[`counter'-1]
-				local h_`this_counter'  = `h_`previous_counter'' - `spacing'
-			}
-			
-			local counter = `counter'+1
-				
-		}
-
-		sort `current_sort'
-	}
-	else {
-		local h_1 = `h'
-	}
-
-	local all_colors = "`colors'"
-	if "`grouping_var'" !="" {
-			local group_bm_line = ""
-			local group_bm_box = ""
-			local counter = 1
-			foreach group in `group_levels' {
-			
-				local group_label: label (`grouping_var') `group'
-					
 				gettoken this_color all_colors: all_colors, parse("|")
 				if "`this_color'" == "|" {
 					gettoken this_color all_colors: all_colors, parse("|")
 				}
-				local group_bm_line = "`group_bm_line' || pci 0 `li_benchmark_`counter'' `h_`counter'' `li_benchmark_`counter'', color(`this_color')"
-				local group_bm_box = `"`group_bm_box' text(`h_`counter'' `li_benchmark_`counter'' "Living Income `group_label': `share_li_`counter'' above", size(small)  place(right) box margin(1 1 1 1) fcolor(`this_color'))"'
-			
-				local counter = `counter'+1
-		
-		
-			
+				
+				capture graph drop "detailed_all_groups"
+				line `temp_y' `temp_x', color(`this_color') recast(area) ///
+				ytitle("`ytitle'") `ticks_x' `ticks_y'  xlabel(, labsize(small)) note("`Note'") graphregion(color(white)) ///
+				legend(label( 1 "All groups") label(2 "Living Income Benchmark") label(3 "mean") label(4 "median"))  || ///
+				pci 0 `li_benchmark_`counter'' `h' `li_benchmark_`counter'', color(red) || ///
+				pci 0 `this_mean' `h' `this_mean', color(blue) || ///
+				pci 0 `this_median' `h' `this_median', color(green) ///
+				xtitle("`hh_income_label'") ///
+				text(`h' `li_benchmark_`counter'' "`share_li_`counter'' above the benchmark", place(right)) ///
+				name("detailed_all_groups")
+				
+				if "`save_graph_as'" != "" {
+					graph export "`save_graph_as' detailed all groups.png", as(png) width(1000) replace 
+				}
+			}
 		}
-	} 
-	else {
-		gettoken this_color all_colors: all_colors, parse("|")
-		local group_bm_line = " || pci 0 `li_benchmark_1' `h_1' `li_benchmark_1', color(`this_color')"
-		local group_bm_box = `" text(`h_1' `li_benchmark_1' "Living Income Benchmark", size(small)  place(right) box margin(1 1 1 1) fcolor(`this_color'))"'	
+		else {
+
+			local counter = 1
+			qui: sum `hh_income' if  `touse', det
+			local Note = "N = `r(N)'"
+			local Note = "`Note', bin size = `w_2'"
+			local this_mean = `r(mean)'
+			local this_median = `r(p50)'
+
+			qui: sum `temp_bm_achieved' if  `touse'
+			local share_li = round((`r(mean)')*100,0.1)
+			local share_li_`counter' = ustrleft(string(`share_li'),4) + "%"
+
+			qui: sum `li_benchmark' if  `touse'
+			local li_benchmark_`counter' = round(`r(mean)',1)
+
+			if "`show_detailed_graph'" !="" | {
+
+				gettoken this_color all_colors: all_colors, parse("|")
+				if "`this_color'" == "|" {
+					gettoken this_color all_colors: all_colors, parse("|")
+				}
+
+				capture graph drop "detailed"
+				line `temp_y' `temp_x', color(`this_color') recast(area) ///
+				ytitle("`ytitle'") `ticks_x' `ticks_y'  xlabel(, labsize(small)) note("`Note'") graphregion(color(white)) ///
+				legend(label( 1 "All") label(2 "Living Income Benchmark") label(3 "mean") label(4 "median"))  || ///
+				pci 0 `li_benchmark_`counter'' `h' `li_benchmark_`counter'', color(red) || ///
+				pci 0 `this_mean' `h' `this_mean', color(blue) || ///
+				pci 0 `this_median' `h' `this_median', color(green) ///
+				xtitle("`hh_income_label'") ///
+				text(`h' `li_benchmark_`counter'' "`share_li_`counter'' above the benchmark", place(right)) ///
+				name("detailed")
+				
+				if "`save_graph_as'" != "" {
+					graph export "`save_graph_as' detailed.png", as(png) width(1000) replace 
+				}
+			}
+
+		}
+
+
+		if "`show_graph'" !="" | {
+			** All together
+			** Decide on the heights, ordering by benchmark value:
+			if "`grouping_var'" !="" {
+				tempvar temp_order_height temp_order_height_counter current_sort
+				local counter = 1
+				qui: gen `temp_order_height' = .
+				qui: gen `temp_order_height_counter' = .
+				foreach group in `group_levels' {
+
+					qui: replace `temp_order_height' =  `li_benchmark_`counter'' in `counter'
+					qui: replace `temp_order_height_counter' =  `counter' in `counter'
+					local counter = `counter'+1
+					
+				}
+
+				gen `current_sort' = [_n]
+				sort `temp_order_height'
+
+				local counter = 1
+				foreach group in `group_levels' {
+
+					if `counter' == 1 {
+						local this_counter = `temp_order_height_counter'[`counter']
+						local h_`this_counter'  = `h'
+
+					} 
+					else {
+						local this_counter = `temp_order_height_counter'[`counter']
+						local previous_counter = `temp_order_height_counter'[`counter'-1]
+						local h_`this_counter'  = `h_`previous_counter'' - `spacing'
+					}
+					
+					local counter = `counter'+1
+						
+				}
+
+				sort `current_sort'
+			}
+			else {
+				local h_1 = `h'
+			}
+
+			local all_colors = "`colors'"
+			if "`grouping_var'" !="" {
+					local group_bm_line = ""
+					local group_bm_box = ""
+					local counter = 1
+					foreach group in `group_levels' {
+					
+						local group_label: label (`grouping_var') `group'
+							
+						gettoken this_color all_colors: all_colors, parse("|")
+						if "`this_color'" == "|" {
+							gettoken this_color all_colors: all_colors, parse("|")
+						}
+						local group_bm_line = "`group_bm_line' || pci 0 `li_benchmark_`counter'' `h_`counter'' `li_benchmark_`counter'', color(`this_color')"
+						local group_bm_box = `"`group_bm_box' text(`h_`counter'' `li_benchmark_`counter'' "Living Income `group_label': `share_li_`counter'' above", size(small)  place(right) box margin(1 1 1 1) fcolor(`this_color'))"'
+					
+						local counter = `counter'+1
+				
+				
+					
+				}
+			} 
+			else {
+				gettoken this_color all_colors: all_colors, parse("|")
+				local group_bm_line = " || pci 0 `li_benchmark_1' `h_1' `li_benchmark_1', color(`this_color')"
+		        local group_bm_box = `" text(`h_1' `li_benchmark_1' "Living Income Benchmark: `share_li_1' above", size(small)  place(right) box margin(1 1 1 1) fcolor(`this_color'))"'
+			}
+
+
+			capture graph drop "all_combined"
+			line `temp_y' `temp_x',   /// 
+			ytitle("`ytitle'") `ticks_x' `ticks_y'  xtitle("`hh_income_label'") ///
+			xlabel(, labsize(small)) note(`Note_full') graphregion(color(white)) ///
+			legend(`labels_cmd') ///
+			`group_graph' ///
+			`group_bm_line' ///
+			`group_bm_box' ///
+			name("all_combined")
+
+			* save graph *
+			if "`save_graph_as'" != "" {
+				graph export "`save_graph_as'.png", as(png) width(1000) replace 
+			}
+		}
+
 	}
+	********************************************
+	* display table with results
 
+	display in b _newline
+	display in b "Share of observations above the Living Income Benchmark" 
 
-	line `temp_y' `temp_x',   /// 
-	ytitle("`ytitle'") `ticks_x' `ticks_y'  xtitle("`this_var'") ///
-	xlabel(, labsize(small)) note(`Note_full') graphregion(color(white)) ///
-	legend(`labels_cmd') ///
-	`group_graph' ///
-	`group_bm_line' ///
-	`group_bm_box' 
+	if "`grouping_var'" !="" { // show per group, than total
 
-	if "`save'" != "nosave" {
-		graph export "`subfolder'`var'_living_income_bechmark.png", width(1000) replace
+		** per groups
+		foreach group in `group_levels' {
+
+			local group_label: label (`grouping_var') `group'
+	
+			qui: sum `temp_bm_achieved' if `grouping_var' == `group' & `touse' 
+			local share_li = `r(mean)'*100
+			display in b ""
+			display in b "`group_label'" 
+			display in b "n = `r(N)'"
+			display in b ""
+			display as text %35s "Above the Living Income Benchmark: " /*
+				*/ as result /*
+				*/ %9.1f `share_li' "%"
+			di as text "{hline 73}"
+		}
+
+		** all groups together
+		qui: sum `temp_bm_achieved' if `grouping_var' != . & `touse' 
+		local share_li = `r(mean)'*100
+		display in b ""
+		display in b "All groups"
+		display in b "n = `r(N)'"
+		display in b ""
+		display as text %35s "Above the Living Income Benchmark: " /*
+			*/ as result /*
+			*/ %9.1f `share_li' "%"
+		di as text "{hline 73}"
+	}
+	else { // no groups
+
+		qui: sum `temp_bm_achieved' if  `touse' 
+		local share_li = `r(mean)'*100
+		display in b ""
+		display in b "n = `r(N)'"
+		display in b ""
+		display as text %35s "Above the Living Income Benchmark: " /*
+			*/ as result /*
+			*/ %9.1f `share_li' "%"
+		di as text "{hline 73}"
 	}
 
 end
