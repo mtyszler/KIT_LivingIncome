@@ -53,7 +53,7 @@ program define KITLI_gap2bm, sortpreserve
 	color_food_value(string) ///
 	color_gap(string) ///
 	show_graph ///
-	save_as(string) ///
+	save_graph_as(string) ///
 	as_share ///
 	]
 	
@@ -613,10 +613,10 @@ program define KITLI_gap2bm, sortpreserve
 		 
 	
 	* save graph *
-	if "`save_as'" != "" {
-		graph export "`save_as'.png", as(png) width(1000) replace 
+	if "`save_graph_as'" != "" {
+		graph export "`save_graph_as'.png", as(png) width(1000) replace 
 	}
 
-	*/
+
 
 end
