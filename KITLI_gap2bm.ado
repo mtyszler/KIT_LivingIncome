@@ -50,8 +50,8 @@ program define KITLI_gap2bm, sortpreserve
 	color_hh_income(string) ///
 	color_main_income(string) ///
 	color_other_than_main_income(string) ///
-	color_gap(string) ///
 	color_food_value(string) ///
+	color_gap(string) ///
 	show_graph ///
 	save_as(string) ///
 	as_share ///
