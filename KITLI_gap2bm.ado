@@ -255,25 +255,25 @@ program define KITLI_gap2bm, sortpreserve
 		if "`grouping_var'" !="" {
 
 			if "`main_income'" != "" {
-				qui: by `grouping_var', sort: egen `temp_mainincome' = mean(`main_income') if `touse' & `main_income' !=.
+				qui: by `grouping_var', sort: egen `temp_mainincome' = mean(`main_income') if `touse' 
 			}
 			if "`food_value'" !="" {
-				qui: by `grouping_var', sort: egen `temp_foodvalue' = mean(`food_value') if `touse' & `food_value' !=.
+				qui: by `grouping_var', sort: egen `temp_foodvalue' = mean(`food_value') if `touse' 
 			}
-			qui: by `grouping_var', sort: egen `temp_totalincome' = mean(`hh_income') if `touse' & `hh_income' !=.
-			qui: by `grouping_var', sort: egen `temp_benchmark' = mean(`li_benchmark') if `touse' & `li_benchmark' !=.
+			qui: by `grouping_var', sort: egen `temp_totalincome' = mean(`hh_income') if `touse'
+			qui: by `grouping_var', sort: egen `temp_benchmark' = mean(`li_benchmark') if `touse' 
 			
 			local this_over = ", over(`grouping_var')"
 		}
 		else {
 			if "`main_income'" != "" {
-				qui: egen `temp_mainincome' = mean(`main_income') if `touse' & `main_income' !=.
+				qui: egen `temp_mainincome' = mean(`main_income') if `touse' 
 			}
 			if "`food_value'" !="" {
-				qui: egen `temp_foodvalue' = mean(`food_value') if `touse' & `food_value' !=.
+				qui: egen `temp_foodvalue' = mean(`food_value') if `touse' 
 			}
-			qui: egen `temp_totalincome' = mean(`hh_income') if `touse' & `hh_income' !=.
-			qui: egen `temp_benchmark' = mean(`li_benchmark') if `touse' & `li_benchmark' !=.
+			qui: egen `temp_totalincome' = mean(`hh_income') if `touse' 
+			qui: egen `temp_benchmark' = mean(`li_benchmark') if `touse' 
 			
 			local this_over = ", "
 		}
