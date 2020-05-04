@@ -1,8 +1,8 @@
-# Living Income Benchmark Update
+# Living Income Calculation tools
 ## Developed by [KIT](http://www.kit.nl) and [COSA](http://thecosa.org/)
-[Last update 31/10/2019] 
+[Last update 4/5/2020] 
 
-A set of (stata) tools to comppute gap towards the Living Income Benchmark and how to present it.
+A set of (stata) tools to compute gap towards the Living Income Benchmark and how to present it.
 
 
 ### Who do I talk to? ###
