@@ -1,0 +1,3 @@
+v 0.1
+d `KIT_LivingIncome`: LIVING INCOME CALCULATIONS AND OUTPUTS: stata ado-file produces tables and charts of the Gap to the Living Income Benchmark
+p KIT_LivingIncome
