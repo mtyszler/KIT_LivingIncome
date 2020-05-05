@@ -1,0 +1,19 @@
+v 0.1
+d 'kit_livingincome': LIVING INCOME CALCULATIONS AND OUTPUTS: stata package to produce tables and charts of the Gap to the Living Income Benchmark
+d Marcelo Tyszler, PhD, KIT Royal Tropical Institute
+d 
+d These stata ado-file produces tables and charts of the Gap to the Living Income Benchmark
+d 
+d It produces graphs similar to what can be seen at:
+d https://www.kit.nl/wp-content/uploads/2019/01/Analysis-of-the-income.pdf
+d https://docs.wixstatic.com/ugd/0c5ab3_93560a9b816d40c3a28daaa686e972a5.pdf
+d
+d package maintained at:
+d https://github.com/mtyszler/KIT_LivingIncome/
+d 
+d Distribution-Date: 20200505
+d
+F kitli_gap2bm.ado
+F kitli_gap2bm.sthlp
+F kitli_compare2bm.ado
+F kitli_compare2bm.sthlp

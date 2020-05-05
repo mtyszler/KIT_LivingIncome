@@ -7,8 +7,10 @@ It produces graphs similar to what can be seen at:
 https://www.kit.nl/wp-content/uploads/2019/01/Analysis-of-the-income.pdf
 https://docs.wixstatic.com/ugd/0c5ab3_93560a9b816d40c3a28daaa686e972a5.pdf
 
-It assumes that key variables have already been calculated. Type
-help KITLI_gap2bm for more details
+It assumes that key variables have already been calculated. 
+
+Type
+help kitli_gap2bm for more details
 
 ---------------------------------------------------------------------------
 
@@ -20,21 +22,21 @@ ISEAL, Living Income Community of Practice and GIZ
 
 You are free to use it and modify for your needs. BUT PLEASE CITE US:
 
-Tyszler, et al. (2019). Living Income Calculations Toolbox. KIT ROYAL TROPICAL 
-INSTITUTE and COSA. Available at: https://bitbucket.org/kitimpactteam/living-income-calculations/
+Tyszler, et al. (2020). Living Income Calculations Toolbox. KIT ROYAL TROPICAL 
+INSTITUTE and COSA. Available at: https://github.com/mtyszler/KIT_LivingIncome/
 
 This work is licensed under the Creative Commons Attribution-ShareAlike 4.0 International License. 
 To view a copy of this license, visit http://creativecommons.org/licenses/by-sa/4.0/.
 
 -----------------------------------------------------------------------------
 Last Update:
-01/05/2020
+05/05/2020
 
 *****************************************************************************/
 
 version 15.1 
-capture program drop KITLI_gap2bm
-program define KITLI_gap2bm, sortpreserve
+capture program drop kitli_gap2bm
+program define kitli_gap2bm, sortpreserve
 	syntax varname(numeric) [if] [in], ///
 	hh_income(varname numeric) ///
 	[main_income(varname numeric) ///

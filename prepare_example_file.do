@@ -29,4 +29,4 @@ drop hh_income_perc_othercrops-hh_income_perc_other
 drop cocoa_revenue_usdha
 drop cocoa_hh_mostimp
 
-save "KITLI_exampledata.dta", replace
+save "kitli_exampledata.dta", replace
