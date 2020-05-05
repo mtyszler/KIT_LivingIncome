@@ -52,6 +52,7 @@
 
 
 {syntab: Graph colors}
+
 {synopt :{opth color_hh_income:(colorstyle)}} Color of total income. Default "blue%30". Used if {opth main_income:(varname)} is NOT provided {p_end}
 {synopt :{opth color_main_income:(colorstyle)}} Color of main source of income. Default "blue%30". Used if {opth main_income:(varname)} is provided{p_end}
 {synopt :{opth color_other_than_main_income:(colorstyle)}} Color of remaining income. Default "ebblue%30". Used if {opth main_income:(varname)} is provided {p_end}
