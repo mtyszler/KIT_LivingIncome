@@ -30,11 +30,11 @@ To view a copy of this license, visit http://creativecommons.org/licenses/by-sa/
 
 -----------------------------------------------------------------------------
 Last Update:
-05/05/2020
+16/06/2020
 
 *****************************************************************************/
 
-version 15.1 
+version 13 
 capture program drop kitli_gap2bm
 program define kitli_gap2bm, sortpreserve
 	syntax varname(numeric) [if] [in], ///
