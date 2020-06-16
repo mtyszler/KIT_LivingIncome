@@ -171,8 +171,17 @@ program define kitli_compare2bm, sortpreserve
 		else if r(max) < = 5000 {
 			local w = 200
 		}
-		else {
+		else if r(max) < = 10000 {
 			local w = 1000
+		}
+		else if r(max) < = 50000 {
+			local w = 10000
+		}
+		else if r(max) < = 1000000 {
+			local w = 100000
+		}
+		else {
+			local w = 1000000
 		}
 		local ticks_x  = "xlabel(0(`w')`r(max)')"
 
