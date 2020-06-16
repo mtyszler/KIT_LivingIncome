@@ -1,5 +1,5 @@
 {smcl}
-{* *! version 0.1  5may2020}{...}
+{* *! version 1.0  16mjune2020}{...}
 
 {title:Title}
 

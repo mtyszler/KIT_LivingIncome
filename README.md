@@ -2,7 +2,7 @@
 [![License: CC BY-SA 4.0](https://img.shields.io/badge/License-CC%20BY--SA%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by-sa/4.0/)
 
 ## Developed by [KIT](http://www.kit.nl) and [COSA](http://thecosa.org/)
-[Last update 4/5/2020] 
+[Last update 16/6/2020] 
 
 'kit_livingincome' provides stata ado-file to produce tables and charts of the Gap to the Living Income Benchmark
  
@@ -20,7 +20,7 @@ Carlos de los Rios. COSA. cd@thecosa.org
 
 ### Requirements
 
-* Stata version 15.1 
+* Stata version 13 
 
 ### Installing `kit_livingincome`
 
