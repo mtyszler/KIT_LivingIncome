@@ -33,7 +33,7 @@ Last Update:
 
 *****************************************************************************/
 
-version 15.1 
+version 13 
 capture program drop kitli_compare2bm
 program define kitli_compare2bm, sortpreserve
 	syntax varname(numeric) [if] [in], ///

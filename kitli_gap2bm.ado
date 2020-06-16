@@ -34,7 +34,7 @@ Last Update:
 
 *****************************************************************************/
 
-version 15.1 
+version 13 
 capture program drop kitli_gap2bm
 program define kitli_gap2bm, sortpreserve
 	syntax varname(numeric) [if] [in], ///
