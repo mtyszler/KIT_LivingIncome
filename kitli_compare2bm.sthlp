@@ -30,7 +30,8 @@
 {syntab: Graph options}
 
 {synopt :{opt ytitle:(text)}} Text for y axis. Default "Proportion of households (%)" {p_end}
-{synopt :{opt spacing:(number)}} Value for spacing between the boxes of the combined graph of all groups. Default to 0.02 {p_end}
+{synopt :{opt spacing:(number)}} Value for spacing between the boxes of the combined graph of all groups. Defaults to 0.02 {p_end}
+{synopt :{opt step_size:(integer)}} Value for step size in the x-axis. Defaults to a value calculated internally {p_end}
 {synopt :{opt colors:(text)}} String with colors for the graph. Default "ebblue%30 | blue%30 | green%30 | orange%30" {p_end}
 
 {syntab: Graph exporting}
@@ -84,7 +85,10 @@
 {opt ytitle:(text)} Text for y axis. If not specified,  {it:Proportion of households(%)} is shown. {p_end}
 
 {pmore}
-{opt spacing:(number)} Value for spacing between the boxes of the combined graph of all groups. Only relevant if grouping_var:(varname) is provided. Default to 0.02 {p_end}
+{opt spacing:(number)} Value for spacing between the boxes of the combined graph of all groups. Only relevant if grouping_var:(varname) is provided. Defaults to 0.02 {p_end}
+
+{pmore}
+{opt step_size:(integer)} Value for step size in the x-axis. Bin size for the density calculation is set as half of this value. If ommitted, it is calculated internally. Because the internal calculation might not suit all ranges of values, the user can choose to override its value {p_end}
 
 {pmore}
 {opt colors:(text)} Colors for the curves. Multiple colors need to be separated by a "|".  Default "ebblue%30 | blue%30 | green%30 | orange%30".  {p_end}

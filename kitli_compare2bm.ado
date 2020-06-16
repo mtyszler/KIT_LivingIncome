@@ -41,6 +41,7 @@ program define kitli_compare2bm, sortpreserve
 	[grouping_var(varname numeric) ///
 	ytitle(string) ///
 	spacing(real 0.02) ///
+	step_size(integer -1) ///
 	colors(string) ///
 	show_graph ///
 	show_detailed_graph ///
@@ -54,7 +55,7 @@ program define kitli_compare2bm, sortpreserve
 	marksample touse, novarlist
 
 	** color can only be provided if graph is requested:
-	if "`show_graph'" == ""  & "`show_detailed_graph'" == ""  & ("`colors'" !="" | "`ytitle'" !="" | `spacing' !=0.02 ) {
+	if "`show_graph'" == ""  & "`show_detailed_graph'" == ""  & ("`colors'" !="" | "`ytitle'" !="" | `spacing' !=0.02 | `step_size' != -1 ) {
 		display as error "WARNING: Graph options will be ignored if neither {it:show_graph} nor {it:show_detailed_graph} are requested."
 	}
 	
@@ -150,38 +151,44 @@ program define kitli_compare2bm, sortpreserve
 
 		********************************************
 		 * Prepare graph:
-		if r(max) < =  2 {
-			local w = 0.1
-		} 
-		else if r(max) < = 50 {
-			local w = 1
-		} 
-		else if r(max) < = 100 {
-			local w = 10
-		}
-		else if r(max) < = 500 {
-			local w = 25
-		}
-		else if r(max) < = 1000 {
-			local w = 50
-		}
-		else if r(max) < = 2000 {
-			local w = 100
-		}
-		else if r(max) < = 5000 {
-			local w = 200
-		}
-		else if r(max) < = 10000 {
-			local w = 1000
-		}
-		else if r(max) < = 50000 {
-			local w = 10000
-		}
-		else if r(max) < = 1000000 {
-			local w = 100000
+
+		if `step_size' == -1 { 
+			if r(max) < =  2 {
+				local w = 0.1
+			} 
+			else if r(max) < = 50 {
+				local w = 1
+			} 
+			else if r(max) < = 100 {
+				local w = 10
+			}
+			else if r(max) < = 500 {
+				local w = 25
+			}
+			else if r(max) < = 1000 {
+				local w = 50
+			}
+			else if r(max) < = 2000 {
+				local w = 100
+			}
+			else if r(max) < = 5000 {
+				local w = 200
+			}
+			else if r(max) < = 10000 {
+				local w = 1000
+			}
+			else if r(max) < = 50000 {
+				local w = 10000
+			}
+			else if r(max) < = 1000000 {
+				local w = 100000
+			}
+			else {
+				local w = 1000000
+			}
 		}
 		else {
-			local w = 1000000
+			local w = `step_size'
 		}
 		local ticks_x  = "xlabel(0(`w')`r(max)')"
 
