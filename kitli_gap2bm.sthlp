@@ -79,8 +79,7 @@
 
 {pstd} {browse "https://docs.wixstatic.com/ugd/0c5ab3_93560a9b816d40c3a28daaa686e972a5.pdf"}
 
-{pstd} It computes, optionally, the average, median household and breaksdown its income into main income, other income, gap to the living income benchmark. Optionally it includes the value
-for the intrinsic value of food crops produced and consumed at home. Optionally, it computes the FGT index.
+{pstd} It computes, optionally, the mean or median household income and breaks it down into main income, other income, gap to the living income benchmark. Optionally it includes the intrinsic value of food crops produced and consumed at home. Optionally, it computes the FGT index.
 
 
 {title:Arguments}
