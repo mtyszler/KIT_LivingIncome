@@ -251,7 +251,7 @@ program define kitli_gap2bm, sortpreserve
 		}
 
 		* Elements for the tables:
-		local text_tbl = "Gap of the median income to the Living Income Benchmark"
+		local text_tbl = "Gap of the median income to the (median) Living Income Benchmark"
 
 		* Elements for the graphs
 		local this_title = "Median values"
@@ -289,7 +289,7 @@ program define kitli_gap2bm, sortpreserve
 		}
 
 		* Elements for the tables:
-		local text_tbl = "Gap of the average income to the Living Income Benchmark"
+		local text_tbl = "Gap of the mean income to the (mean) Living Income Benchmark"
 
 		* Elements for the graphs
 		local this_title = "Mean values"
