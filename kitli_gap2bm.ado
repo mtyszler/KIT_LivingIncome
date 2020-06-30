@@ -64,6 +64,14 @@ program define kitli_gap2bm, sortpreserve
 	********************************************
 	** Prepare observations which will be used 
 	marksample touse, novarlist
+	qui: replace `touse' = 0 if `varlist' == .
+	qui: replace `touse' = 0 if `hh_income' == .
+	if "`main_income'" != "" & "`metric'" != "FGT" {
+		qui: replace `touse' = 0 if `main_income' == .
+	}
+	if "`food_value'" !="" {
+		qui: replace `touse' = 0 if `food_value' == .
+	}
 
 
 	********************************************
@@ -317,13 +325,13 @@ program define kitli_gap2bm, sortpreserve
 		* Elements for the graphs
 		local this_title = "FGT index"
 	}
-	 
+
 
 	********************************************
 	** Compute gap and other elements
 	qui: gen `temp_gap2benchmark' = `temp_benchmark' - `temp_totalincome' if `touse'
-	
-	if "`main_income'" != "" {
+
+	if "`main_income'" != "" & "`metric'" != "FGT" {
 		qui: gen `temp_other_than_main' = `temp_totalincome' - `temp_mainincome' if `touse'
 	}
 	if "`food_value'" != "" {
