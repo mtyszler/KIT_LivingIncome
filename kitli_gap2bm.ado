@@ -197,7 +197,7 @@ program define kitli_gap2bm, sortpreserve
 
 	** check for valid combination of inputs
 	if "`metric'" == "FGT" & "`main_income'" != ""   {
-		display as error "WARNING: {it:main_income} will be combined if metric is {it:FGT}"
+		display as error "WARNING: {it:main_income} will be ignored if metric is {it:FGT}"
 	}
 
 
