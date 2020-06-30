@@ -174,7 +174,7 @@ program define kitli_compare2bm, sortpreserve
 			else if r(max) < = 5000 {
 				local w = 200
 			}
-			else if r(max) < = 10000 {
+			else if r(max) < = 20000 {
 				local w = 1000
 			}
 			else if r(max) < = 50000 {
