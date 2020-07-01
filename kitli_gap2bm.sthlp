@@ -93,7 +93,8 @@
 {dlgtab:Mandatory}
 
 {pmore}
-{opth hh_income:(varname)} {varname} of total household income, including the main income source. 
+{opth hh_income:(varname)} {varname} of total household income, including the main income source
+but excluding intrinsic value of food produced at home. 
 
 
 {pmore}{it:{cmd:li_benchmark} and {opth hh_income:(varname)} need to be in the same currency and unit (e.g., USD per household).}
@@ -104,10 +105,15 @@
 {pmore}
 
 {pmore}
-{opth main_income:(varname)} {varname} of total income from main source, for example main crop sales. If provided, the outputs assume there is one main income source. 
+{opth main_income:(varname)} {varname} of total income from main source, for example main crop sales. If provided, the outputs assume there is one main income source. The calculations are done  only for complete observations, i.e., if 
+{opth main_income:(varname)} is provided, observations
+where {opth main_income:(varname)} is missing will be excluded from the calculations. 
 
 {pmore}
-{opth food_value:(varname)} {varname} of the value of food produced and consumed at home. If provided, it is added to the total income. 
+{opth food_value:(varname)} {varname} of the value of food produced and consumed at home. If provided, it is added to the total income. The calculations are done only for complete observations, i.e., if {opth food_value:(varname)} is provided, 
+observations where
+{opth food_value:(varname)} is missing will be excluded from the calculations. 
+If provided, it will be added to the {opth hh_income:(varname)}
 
 
 {pmore}{it: {opth main_income:(varname)}  and {opth food_value:(varname)} need to be in the same currency and unit as {it:{cmd:li_benchmark}} (e.g., USD per household).}
