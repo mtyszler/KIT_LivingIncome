@@ -72,6 +72,9 @@ program define kitli_gap2bm, sortpreserve
 	if "`food_value'" !="" {
 		qui: replace `touse' = 0 if `food_value' == .
 	}
+	if "`grouping_var'" !="" {
+		qui: replace `touse' = 0 if `grouping_var' == .
+	}
 
 
 	********************************************
@@ -301,10 +304,10 @@ program define kitli_gap2bm, sortpreserve
 
 		if "`grouping_var'" !="" {
 			if "`food_value'" != "" {
-				qui: gen `temp_foodvalue' = `food_value' if `touse' & `grouping_var' != .
+				qui: gen `temp_foodvalue' = `food_value' if `touse'
 			}
-			qui: gen `temp_totalincome' = `hh_income' if `touse' & `grouping_var' != .
-			qui: gen `temp_benchmark' = `li_benchmark' if `touse' & `grouping_var' != .
+			qui: gen `temp_totalincome' = `hh_income' if `touse' 
+			qui: gen `temp_benchmark' = `li_benchmark' if `touse' 
 
 			local this_over = ", over(`grouping_var')"
 		}
@@ -451,7 +454,7 @@ program define kitli_gap2bm, sortpreserve
 		}
 
 		** all groups together
-		qui: sum `temp_gap2benchmark' if `grouping_var' != . & `touse' 
+		qui: sum `temp_gap2benchmark' if `touse' 
 		display in b ""
 		display in b "All groups"
 		display in b "n = `r(N)'"
@@ -462,38 +465,38 @@ program define kitli_gap2bm, sortpreserve
 		
 		if "`metric'" != "FGT" { // mean of median
 			if "`main_income'" != "" {
-				qui: sum `temp_mainincome' if `grouping_var' != . & `touse' 
+				qui: sum `temp_mainincome' if `touse' 
 				display as text %35s "`label_main_income':" /*
 								*/ as result /*
 								*/ %9.0f `r(mean)' "`show_pct'"
 
-				qui: sum `temp_other_than_main' if `grouping_var' != . & `touse' 
+				qui: sum `temp_other_than_main' if  `touse' 
 				display as text %35s "`label_other_than_main_income':" /*
 								*/ as result /*
 								*/ %9.0f `r(mean)' "`show_pct'"
 			}
 			else {
-				qui: sum `temp_totalincome' if `grouping_var' != . & `touse' 
+				qui: sum `temp_totalincome' if  `touse' 
 				display as text %35s "`label_hh_income':" /*
 								*/ as result /*
 								*/ %9.0f `r(mean)' "`show_pct'"
 			}
 
 			if "`food_value'" != "" {
-				qui: sum `temp_foodvalue' if `grouping_var' != . & `touse' 
+				qui: sum `temp_foodvalue' if  `touse' 
 				display as text %35s "`label_food_value':" /*
 								*/ as result /*
 								*/ %9.0f `r(mean)' "`show_pct'"
 			}
 
 
-			qui: sum `temp_gap2benchmark' if `grouping_var' != . & `touse' 
+			qui: sum `temp_gap2benchmark' if  `touse' 
 			display as text %35s "Gap to the Living Income Benchmark:" /*
 							*/ as result /*
 							*/ %9.0f `r(mean)' "`show_pct'"
 		}
 		else { //FGT
-			qui: sum `temp_gap2benchmark' if `grouping_var' != . & `touse' 
+			qui: sum `temp_gap2benchmark' if  `touse' 
 			display as text %35s "FGT index:" /*
 							*/ as result /*
 							*/ %9.0f `r(mean)' "%"
@@ -504,7 +507,7 @@ program define kitli_gap2bm, sortpreserve
 		if "`as_share'" == "as_share" | "`metric'" == "FGT"  {
 			display as text %35s "" as text "`benchmark_unit'"
 		}
-		qui: sum `temp_benchmark' if `grouping_var' != . & `touse'
+		qui: sum `temp_benchmark' if  `touse'
 		display as text %35s "Living Income Benchmark" /*
 						*/ as result /*
 						*/ %9.0f `r(mean)' 
