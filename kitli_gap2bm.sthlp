@@ -31,7 +31,7 @@
 
 {synopt :{opt metric:(mean)}}  computes {help mean} (default) {p_end}
 {synopt :{opt metric:(median)}}  computes {help egen:medians} {p_end}
-{synopt :{opt metric:(FGT)}}  computes {it: FGT} index {p_end}
+{synopt :{opt metric:(FGT)}}  computes the {it: FGT} index {p_end}
 
 {syntab: Calculation}
 
@@ -129,7 +129,12 @@ If provided, it will be added to the {opth hh_income:(varname)}
 {opt metric:(median)}  computes {help egen:medians} and compare median values to the living income benchmark {p_end}
 
 {pmore}
-{opt metric:(FGT)}  computes {it: FGT} index {p_end}
+{opt metric:(FGT)}  computes the {it: FGT} index.
+The Foster–Greer–Thorbecke (FGT) indices focuses on those below a reference threshold, by assigning a gap value of 0 to 
+those above the line. It provides an indication of the depth of the poverty among the poor.  
+We adapt the original poverty gap metric by replacing the poverty line with the Living Income Benchmark. 
+It takes the mean of the income gap per household, as a share, assigning a gap of 0 to those 
+above the benchmark line. {p_end}
 
 {dlgtab:Calculation}
 {pmore}
