@@ -192,12 +192,6 @@ bars in graphs are normalized to 100% of the benchmark value. {p_end}
 {dlgtab: Graph exporting}
 
 {pmore}
-{cmd:nosave} does not save the generated graph (default behavior is to save). Graph name will start with "bar_LI_gap" and will be followed by "mean" or "median", and include "as_share" and/or "food" as applicable. {p_end}
-
-{pmore}
-{opth subfolder:(text)} (relative) subfolder to save the graph. Default is the current folder. Please make sure name is correct and includes "/" as separator if needed. Folder will be created if necessary. {p_end}
-
-{pmore}
 {cmd:show_graph} shows graph comparing to the benchmark {p_end}
 
 {pmore}
