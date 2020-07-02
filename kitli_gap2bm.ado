@@ -385,7 +385,7 @@ program define kitli_gap2bm, sortpreserve
 	display in b _newline
 	display in b "`text_tbl'" 
 
-	if "`grouping_var'" !="" { // show per group, than total
+	if "`grouping_var'" !="" { // show per group
 
 		qui: levelsof `grouping_var' if `touse', local(group_levels)
 
