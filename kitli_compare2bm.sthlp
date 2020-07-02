@@ -105,7 +105,7 @@
 {cmd:show_detailed_graph} shows the detailed graphs, i.e. distribution, benchmark, mean and median, per group if groups as provided. {p_end}
 
 {pmore}
-{opt save_graph_as:(text)} Main stub for graph saving. Graphs are in ong format. Detailed graphs have the word {it: detailed} appended and group graphs have the group label appended to the file name. {p_end}
+{opt save_graph_as:(text)} Main stub for graph saving. Graphs are in png format. Detailed graphs have the word {it: detailed} appended and group graphs have the group label appended to the file name. {p_end}
 
 
 {title:Examples}
