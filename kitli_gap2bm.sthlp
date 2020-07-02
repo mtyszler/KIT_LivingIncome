@@ -140,7 +140,8 @@ above the benchmark line. {p_end}
 {pmore}
 
 {pmore}
-{cmd:as_share} computes shares of the benchmark value instead of absolute (default), i.e. all bars are normalized to 100% of the benchmark value. {p_end}
+{cmd:as_share} computes shares of the benchmark value instead of absolute (default), i.e. all values add up to 100% and 
+bars in graphs are normalized to 100% of the benchmark value. {p_end}
 
 
 {dlgtab:Grouping}
