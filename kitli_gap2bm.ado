@@ -517,6 +517,28 @@ program define kitli_gap2bm, sortpreserve
 	* Generate graphs
 	if "`show_graph'" !="" {
 
+		** preare notes for the graphs:
+		if "`grouping_var'" !="" { 
+
+			local Note_full = `""Based on:""'
+
+			qui: levelsof `grouping_var' if `touse', local(group_levels)
+
+			** per groups
+			foreach group in `group_levels' {
+
+				local group_label: label (`grouping_var') `group'
+				qui: sum `temp_gap2benchmark' if `grouping_var' == `group' & `touse' 
+				local Note_full = `"`Note_full' "`group_label': `r(N)' observations""'
+				
+			}
+		} 
+		else { // no groups
+
+			qui: sum `temp_gap2benchmark' if  `touse' 
+			local Note_full = `""Based on `r(N)' observations""'
+		}
+
 		if "`metric'" == "FGT" {
 			graph bar (mean)  `temp_gap2benchmark' if `touse'  `this_over' ///
 			stack legend(label(1 "FGT index")) ///
@@ -524,7 +546,8 @@ program define kitli_gap2bm, sortpreserve
 			bar(1, color(`color_gap')) ///
 			blabel(bar, format(%9.0f) position(center) ) ///
 			graphregion(color(white)) bgcolor(white) ///
-			title("`this_title'")
+			title("`this_title'") ///
+			note(`Note_full')
 
 		}  
 		else if "`main_income'" != "" {  
@@ -537,7 +560,8 @@ program define kitli_gap2bm, sortpreserve
 				bar(3, color(`color_gap')) ///
 				blabel(bar, format(%9.0f) position(center) ) ///
 				graphregion(color(white)) bgcolor(white) ///
-				title("`this_title'")
+				title("`this_title'") ///
+				note(`Note_full')
 			}
 			else { // with food
 				graph bar (mean) `temp_mainincome' `temp_other_than_main' `temp_foodvalue' `temp_gap2benchmark' if `touse'  `this_over' ///
@@ -549,7 +573,8 @@ program define kitli_gap2bm, sortpreserve
 				bar(3, color(`color_food_value')) ///
 				blabel(bar, format(%9.0f) position(center) ) ///
 				graphregion(color(white)) bgcolor(white) ///
-				title("`this_title'")
+				title("`this_title'") ///
+				note(`Note_full')
 			}
 		}
 		else {
@@ -561,7 +586,8 @@ program define kitli_gap2bm, sortpreserve
 				bar(2, color(`color_gap')) ///
 				blabel(bar, format(%9.0f) position(center) ) ///
 				graphregion(color(white)) bgcolor(white) ///
-				title("`this_title'")
+				title("`this_title'") ///
+				note(`Note_full')
 			}
 			else { // with food
 				graph bar (mean) `temp_totalincome' `temp_foodvalue' `temp_gap2benchmark' if `touse'  `this_over' ///
@@ -572,7 +598,8 @@ program define kitli_gap2bm, sortpreserve
 				bar(3, color(`color_food_value')) ///
 				blabel(bar, format(%9.0f) position(center) ) ///
 				graphregion(color(white)) bgcolor(white) ///
-				title("`this_title'")
+				title("`this_title'") ///
+				note(`Note_full')
 			}
 		}
 	}
