@@ -1,10 +1,11 @@
 {smcl}
-{* *! version 1.0  16mjune2020}{...}
+{* *! version 1.0  16june2020}{...}
 
 {title:Title}
 
 {phang}
 {bf:(KIT) Living Income Tools} {hline 2} Tables and density (kernel smoothened) plots about the total household income with the goal of comparing to the benchmark value, optionally by groups.
+{it: v1.0, 16jun2020}
 
 {marker syntax}{...}
 {title:Syntax}
