@@ -45,6 +45,7 @@ program define kitli_compare2bm, sortpreserve
 	colors(string) ///
 	show_graph ///
 	show_detailed_graph ///
+	show_bar_graph ///
 	save_graph_as(string) ///
 	]
 	
@@ -61,8 +62,8 @@ program define kitli_compare2bm, sortpreserve
 	
 
 	* Save graph can only be used if graph is requested
-	if "`save_graph_as'" !="" & "`show_detailed_graph'" == ""  & "`show_graph'" == ""   {
-		display as error "WARNING: {it:save_graph_as} will be ignored if neither {it:show_graph} nor {it:show_detailed_graph} are requested."
+	if "`save_graph_as'" !="" & "`show_detailed_graph'" == ""  & "`show_graph'" == ""  & "`show_bar_graph'" == ""   {
+		display as error "WARNING: {it:save_graph_as} will be ignored if neither {it:show_graph} nor {it:show_detailed_graph}  nor {it:show_bar_graph} are requested."
 	}
 
 
@@ -487,6 +488,50 @@ program define kitli_compare2bm, sortpreserve
 				graph export "`save_graph_as'.png", as(png) width(1000) replace 
 			}
 		}
+
+	}
+
+	if "`show_bar_graph'" !="" {
+
+		local this_ylabel = " ylabel(0(10)100, grid)"
+
+		if "`grouping_var'" !="" {
+			local this_over = ", over(`grouping_var')"
+			local Note_full = ""
+
+			* Append group information:
+			if "`grouping_var'" !="" {
+
+				foreach group in `group_levels' {
+					qui: sum `hh_income' if  `grouping_var' == `group' & `touse'
+					local group_label: label (`grouping_var') `group'
+					local Note_full= `"`Note_full' "N (`group_label') = `r(N)'""'				
+				}
+			}
+		}
+		else {
+			local this_over = ", "
+			qui: sum `hh_income' if `touse'
+			local Note_full = `""N = `r(N)'""'
+		}
+
+		tempvar temp_bm_not_achieved_pct
+		qui: gen `temp_bm_not_achieved_pct' = `temp_bm_not_achieved'*100
+
+		graph bar (mean)  `temp_bm_not_achieved_pct' if `touse'  `this_over' ///
+		stack legend(label(1 "Share of observations below the Living Income Benchmark")) ///
+		ytitle("`ytitle'") `this_ylabel' ///
+		bar(1, color("red")) ///
+		blabel(bar, format(%9.0f) position(center) ) ///
+		graphregion(color(white)) bgcolor(white) ///
+		title("Share of observations below the Living Income Benchmark") ///
+		note(`Note_full')
+
+
+		if "`save_graph_as'" != "" {
+			graph export "`save_graph_as' bar.png", as(png) width(1000) replace 
+		}
+
 
 	}
 	********************************************
