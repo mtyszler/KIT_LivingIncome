@@ -139,7 +139,7 @@ Please cite it as such:{p_end}
 
 {phang}
 Tyszler, et al. (2020). Living Income Calculations Toolbox. KIT ROYAL TROPICAL 
-INSTITUTE and COSA. Available at: {browse "include_later":m.tyszler@kit.nl} 
+INSTITUTE and COSA. Available at: {browse "https://github.com/mtyszler/KIT_LivingIncome/"} 
 {p_end}
 
 {phang}
