@@ -54,6 +54,7 @@ program define kitli_compare2bm, sortpreserve
 	********************************************
 	** Prepare observations which will be used 
 	marksample touse, novarlist
+	qui: replace `touse' = 0 if `varlist' == .
 
 	** color can only be provided if graph is requested:
 	if "`show_graph'" == ""  & "`show_detailed_graph'" == ""  & ("`colors'" !="" | "`ytitle'" !="" | `spacing' !=0.02 | `step_size' != -1 ) {
