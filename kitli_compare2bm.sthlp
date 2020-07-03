@@ -1,5 +1,6 @@
 {smcl}
-{* *! version 1.0  16mjune2020}{...}
+{* *! version 1.1  03jul2020}{...}
+{it: v1.1, 03jul2020}
 
 {title:Title}
 
@@ -38,6 +39,7 @@
 
 {synopt :{cmd:show_graph}} shows main graph comparing to the benchmark  {p_end}
 {synopt :{cmd:show_detailed_graph}} shows detailed graphs (per group if gropuing variables is provided) comparing to the benchmark, mean and median values  {p_end}
+{synopt :{cmd:show_bar_graph}} shows a bar graph of the share below the benchmark  {p_end}
 {synopt :{opt save_graph_as:(text)}} main stub of filename to be saved. Graphs will be saved as png format {p_end}
 
 {synoptline}
@@ -46,7 +48,9 @@
 {title:Description}
 
 {pstd}
-{cmd: kitli_compare2bm} produces tables and density ({help kdensity:kernel smoothened}) plots as fractions about the distribution of total household income with the goal of comparing to the benchmark value. If a grouping variable is used, it creates, optionally, a detailed graph per group and a combined graph.
+{cmd: kitli_compare2bm} produces tables, bar charts and density ({help kdensity:kernel smoothened}) plots as fractions about the distribution of 
+total household income with the goal of comparing to the benchmark value. If a grouping variable is used, it creates, optionally, 
+a detailed graph per group and a combined graph.
 
 {pstd} It produces graphs similar to what can be seen at:
 
@@ -105,7 +109,12 @@
 {cmd:show_detailed_graph} shows the detailed graphs, i.e. distribution, benchmark, mean and median, per group if groups as provided. {p_end}
 
 {pmore}
-{opt save_graph_as:(text)} Main stub for graph saving. Graphs are in ong format. Detailed graphs have the word {it: detailed} appended and group graphs have the group label appended to the file name. {p_end}
+{cmd:show_bar_graph} shows a bar graph with the share of those below the benchmark, per group if groups as provided. {p_end}
+
+{pmore}
+{opt save_graph_as:(text)} Main stub for graph saving. Graphs are in png format. Detailed graphs have the word {it: detailed} appended, 
+the bar graph has the word {it: bar} appended and group graphs have the group label appended to the file name. {p_end}
+
 
 
 {title:Examples}
@@ -138,7 +147,7 @@ Please cite it as such:{p_end}
 
 {phang}
 Tyszler, et al. (2020). Living Income Calculations Toolbox. KIT ROYAL TROPICAL 
-INSTITUTE and COSA. Available at: {browse "include_later":m.tyszler@kit.nl} 
+INSTITUTE and COSA. Available at: {browse "https://github.com/mtyszler/KIT_LivingIncome/"} 
 {p_end}
 
 {phang}

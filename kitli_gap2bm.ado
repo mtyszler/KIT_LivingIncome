@@ -30,7 +30,7 @@ To view a copy of this license, visit http://creativecommons.org/licenses/by-sa/
 
 -----------------------------------------------------------------------------
 Last Update:
-16/06/2020
+3/07/2020
 
 *****************************************************************************/
 
@@ -64,6 +64,17 @@ program define kitli_gap2bm, sortpreserve
 	********************************************
 	** Prepare observations which will be used 
 	marksample touse, novarlist
+	qui: replace `touse' = 0 if `varlist' == .
+	qui: replace `touse' = 0 if `hh_income' == .
+	if "`main_income'" != "" & "`metric'" != "FGT" {
+		qui: replace `touse' = 0 if `main_income' == .
+	}
+	if "`food_value'" !="" {
+		qui: replace `touse' = 0 if `food_value' == .
+	}
+	if "`grouping_var'" !="" {
+		qui: replace `touse' = 0 if `grouping_var' == .
+	}
 
 
 	********************************************
@@ -189,7 +200,7 @@ program define kitli_gap2bm, sortpreserve
 
 	** check for valid combination of inputs
 	if "`metric'" == "FGT" & "`main_income'" != ""   {
-		display as error "WARNING: {it:main_income} will be combined if metric is {it:FGT}"
+		display as error "WARNING: {it:main_income} will be ignored if metric is {it:FGT}"
 	}
 
 
@@ -243,7 +254,7 @@ program define kitli_gap2bm, sortpreserve
 		}
 
 		* Elements for the tables:
-		local text_tbl = "Gap of the median income to the Living Income Benchmark"
+		local text_tbl = "Gap of the median income to the (median) Living Income Benchmark"
 
 		* Elements for the graphs
 		local this_title = "Median values"
@@ -281,7 +292,7 @@ program define kitli_gap2bm, sortpreserve
 		}
 
 		* Elements for the tables:
-		local text_tbl = "Gap of the average income to the Living Income Benchmark"
+		local text_tbl = "Gap of the mean income to the (mean) Living Income Benchmark"
 
 		* Elements for the graphs
 		local this_title = "Mean values"
@@ -293,10 +304,10 @@ program define kitli_gap2bm, sortpreserve
 
 		if "`grouping_var'" !="" {
 			if "`food_value'" != "" {
-				qui: gen `temp_foodvalue' = `food_value' if `touse' & `grouping_var' != .
+				qui: gen `temp_foodvalue' = `food_value' if `touse'
 			}
-			qui: gen `temp_totalincome' = `hh_income' if `touse' & `grouping_var' != .
-			qui: gen `temp_benchmark' = `li_benchmark' if `touse' & `grouping_var' != .
+			qui: gen `temp_totalincome' = `hh_income' if `touse' 
+			qui: gen `temp_benchmark' = `li_benchmark' if `touse' 
 
 			local this_over = ", over(`grouping_var')"
 		}
@@ -317,13 +328,13 @@ program define kitli_gap2bm, sortpreserve
 		* Elements for the graphs
 		local this_title = "FGT index"
 	}
-	 
+
 
 	********************************************
 	** Compute gap and other elements
 	qui: gen `temp_gap2benchmark' = `temp_benchmark' - `temp_totalincome' if `touse'
-	
-	if "`main_income'" != "" {
+
+	if "`main_income'" != "" & "`metric'" != "FGT" {
 		qui: gen `temp_other_than_main' = `temp_totalincome' - `temp_mainincome' if `touse'
 	}
 	if "`food_value'" != "" {
@@ -374,7 +385,7 @@ program define kitli_gap2bm, sortpreserve
 	display in b _newline
 	display in b "`text_tbl'" 
 
-	if "`grouping_var'" !="" { // show per group, than total
+	if "`grouping_var'" !="" { // show per group
 
 		qui: levelsof `grouping_var' if `touse', local(group_levels)
 
@@ -442,65 +453,6 @@ program define kitli_gap2bm, sortpreserve
 		
 		}
 
-		** all groups together
-		qui: sum `temp_gap2benchmark' if `grouping_var' != . & `touse' 
-		display in b ""
-		display in b "All groups"
-		display in b "n = `r(N)'"
-		display in b ""
-		display as text %35s "" as text "`this_ytitle'"
-		di as text "{hline 73}"
-	
-		
-		if "`metric'" != "FGT" { // mean of median
-			if "`main_income'" != "" {
-				qui: sum `temp_mainincome' if `grouping_var' != . & `touse' 
-				display as text %35s "`label_main_income':" /*
-								*/ as result /*
-								*/ %9.0f `r(mean)' "`show_pct'"
-
-				qui: sum `temp_other_than_main' if `grouping_var' != . & `touse' 
-				display as text %35s "`label_other_than_main_income':" /*
-								*/ as result /*
-								*/ %9.0f `r(mean)' "`show_pct'"
-			}
-			else {
-				qui: sum `temp_totalincome' if `grouping_var' != . & `touse' 
-				display as text %35s "`label_hh_income':" /*
-								*/ as result /*
-								*/ %9.0f `r(mean)' "`show_pct'"
-			}
-
-			if "`food_value'" != "" {
-				qui: sum `temp_foodvalue' if `grouping_var' != . & `touse' 
-				display as text %35s "`label_food_value':" /*
-								*/ as result /*
-								*/ %9.0f `r(mean)' "`show_pct'"
-			}
-
-
-			qui: sum `temp_gap2benchmark' if `grouping_var' != . & `touse' 
-			display as text %35s "Gap to the Living Income Benchmark:" /*
-							*/ as result /*
-							*/ %9.0f `r(mean)' "`show_pct'"
-		}
-		else { //FGT
-			qui: sum `temp_gap2benchmark' if `grouping_var' != . & `touse' 
-			display as text %35s "FGT index:" /*
-							*/ as result /*
-							*/ %9.0f `r(mean)' "%"
-
-		}
-
-		di as text "{hline 73}"
-		if "`as_share'" == "as_share" | "`metric'" == "FGT"  {
-			display as text %35s "" as text "`benchmark_unit'"
-		}
-		qui: sum `temp_benchmark' if `grouping_var' != . & `touse'
-		display as text %35s "Living Income Benchmark" /*
-						*/ as result /*
-						*/ %9.0f `r(mean)' 
-
 	}
 	else { // no groups
 
@@ -565,6 +517,28 @@ program define kitli_gap2bm, sortpreserve
 	* Generate graphs
 	if "`show_graph'" !="" {
 
+		** preare notes for the graphs:
+		if "`grouping_var'" !="" { 
+
+			local Note_full = `""Based on:""'
+
+			qui: levelsof `grouping_var' if `touse', local(group_levels)
+
+			** per groups
+			foreach group in `group_levels' {
+
+				local group_label: label (`grouping_var') `group'
+				qui: sum `temp_gap2benchmark' if `grouping_var' == `group' & `touse' 
+				local Note_full = `"`Note_full' "`group_label': `r(N)' observations""'
+				
+			}
+		} 
+		else { // no groups
+
+			qui: sum `temp_gap2benchmark' if  `touse' 
+			local Note_full = `""Based on `r(N)' observations""'
+		}
+
 		if "`metric'" == "FGT" {
 			graph bar (mean)  `temp_gap2benchmark' if `touse'  `this_over' ///
 			stack legend(label(1 "FGT index")) ///
@@ -572,7 +546,8 @@ program define kitli_gap2bm, sortpreserve
 			bar(1, color(`color_gap')) ///
 			blabel(bar, format(%9.0f) position(center) ) ///
 			graphregion(color(white)) bgcolor(white) ///
-			title("`this_title'")
+			title("`this_title'") ///
+			note(`Note_full')
 
 		}  
 		else if "`main_income'" != "" {  
@@ -585,7 +560,8 @@ program define kitli_gap2bm, sortpreserve
 				bar(3, color(`color_gap')) ///
 				blabel(bar, format(%9.0f) position(center) ) ///
 				graphregion(color(white)) bgcolor(white) ///
-				title("`this_title'")
+				title("`this_title'") ///
+				note(`Note_full')
 			}
 			else { // with food
 				graph bar (mean) `temp_mainincome' `temp_other_than_main' `temp_foodvalue' `temp_gap2benchmark' if `touse'  `this_over' ///
@@ -597,7 +573,8 @@ program define kitli_gap2bm, sortpreserve
 				bar(3, color(`color_food_value')) ///
 				blabel(bar, format(%9.0f) position(center) ) ///
 				graphregion(color(white)) bgcolor(white) ///
-				title("`this_title'")
+				title("`this_title'") ///
+				note(`Note_full')
 			}
 		}
 		else {
@@ -609,7 +586,8 @@ program define kitli_gap2bm, sortpreserve
 				bar(2, color(`color_gap')) ///
 				blabel(bar, format(%9.0f) position(center) ) ///
 				graphregion(color(white)) bgcolor(white) ///
-				title("`this_title'")
+				title("`this_title'") ///
+				note(`Note_full')
 			}
 			else { // with food
 				graph bar (mean) `temp_totalincome' `temp_foodvalue' `temp_gap2benchmark' if `touse'  `this_over' ///
@@ -620,7 +598,8 @@ program define kitli_gap2bm, sortpreserve
 				bar(3, color(`color_food_value')) ///
 				blabel(bar, format(%9.0f) position(center) ) ///
 				graphregion(color(white)) bgcolor(white) ///
-				title("`this_title'")
+				title("`this_title'") ///
+				note(`Note_full')
 			}
 		}
 	}

@@ -1,10 +1,12 @@
 {smcl}
-{* *! version 1.0  16mjune2020}{...}
+{* *! version 1.1  03jul2020}{...}
+{it: v1.1, 03jul2020}
 
 {title:Title}
 
 {phang}
 {bf:(KIT) Living Income Tools} {hline 2} Tables and Bar charts of the Gap to the Living Income Benchmark.
+
 
 {marker syntax}{...}
 {title:Syntax}
@@ -31,7 +33,7 @@
 
 {synopt :{opt metric:(mean)}}  computes {help mean} (default) {p_end}
 {synopt :{opt metric:(median)}}  computes {help egen:medians} {p_end}
-{synopt :{opt metric:(FGT)}}  computes {it: FGT} index {p_end}
+{synopt :{opt metric:(FGT)}}  computes the {it: FGT} index {p_end}
 
 {syntab: Calculation}
 
@@ -79,8 +81,7 @@
 
 {pstd} {browse "https://docs.wixstatic.com/ugd/0c5ab3_93560a9b816d40c3a28daaa686e972a5.pdf"}
 
-{pstd} It computes, optionally, the average, median household and breaksdown its income into main income, other income, gap to the living income benchmark. Optionally it includes the value
-for the intrinsic value of food crops produced and consumed at home. Optionally, it computes the FGT index.
+{pstd} It computes, optionally, the mean or median household income and breaks it down into main income, other income, gap to the living income benchmark. Optionally it includes the intrinsic value of food crops produced and consumed at home. Optionally, it computes the FGT index.
 
 
 {title:Arguments}
@@ -94,7 +95,8 @@ for the intrinsic value of food crops produced and consumed at home. Optionally,
 {dlgtab:Mandatory}
 
 {pmore}
-{opth hh_income:(varname)} {varname} of total household income, including the main income source. 
+{opth hh_income:(varname)} {varname} of total household income, including the main income source
+but excluding intrinsic value of food produced at home. 
 
 
 {pmore}{it:{cmd:li_benchmark} and {opth hh_income:(varname)} need to be in the same currency and unit (e.g., USD per household).}
@@ -105,10 +107,15 @@ for the intrinsic value of food crops produced and consumed at home. Optionally,
 {pmore}
 
 {pmore}
-{opth main_income:(varname)} {varname} of total income from main source, for example main crop sales. If provided, the outputs assume there is one main income source. 
+{opth main_income:(varname)} {varname} of total income from main source, for example main crop sales. If provided, the outputs assume there is one main income source. The calculations are done  only for complete observations, i.e., if 
+{opth main_income:(varname)} is provided, observations
+where {opth main_income:(varname)} is missing will be excluded from the calculations. 
 
 {pmore}
-{opth food_value:(varname)} {varname} of the value of food produced and consumed at home. If provided, it is added to the total income. 
+{opth food_value:(varname)} {varname} of the value of food produced and consumed at home. If provided, it is added to the total income. The calculations are done only for complete observations, i.e., if {opth food_value:(varname)} is provided, 
+observations where
+{opth food_value:(varname)} is missing will be excluded from the calculations. 
+If provided, it will be added to the {opth hh_income:(varname)}
 
 
 {pmore}{it: {opth main_income:(varname)}  and {opth food_value:(varname)} need to be in the same currency and unit as {it:{cmd:li_benchmark}} (e.g., USD per household).}
@@ -124,13 +131,18 @@ for the intrinsic value of food crops produced and consumed at home. Optionally,
 {opt metric:(median)}  computes {help egen:medians} and compare median values to the living income benchmark {p_end}
 
 {pmore}
-{opt metric:(FGT)}  computes {it: FGT} index {p_end}
+{opt metric:(FGT)}  computes the {it: FGT} index.
+The Foster–Greer–Thorbecke (FGT) indices focuses on those below a reference threshold, by assigning a gap value of 0 to 
+those above the line. It provides an indication of the depth of the poverty among the poor.  
+We adapt the original poverty gap metric by replacing the poverty line with the Living Income Benchmark. 
+It takes the mean of the income gap per household, as a share, assigning a gap of 0 to those 
+above the benchmark line. {p_end}
 
 {dlgtab:Calculation}
 {pmore}
 
 {pmore}
-{cmd:as_share} computes shares of the benchmark value instead of absolute (default), i.e. all bars are normalized to 100% of the benchmark value. {p_end}
+{cmd:as_share} computes shares of the benchmark value instead of absolute (default), i.e. all values shown are in percentage of the benchmark value and add up to 100%. {p_end}
 
 
 {dlgtab:Grouping}
@@ -179,12 +191,6 @@ for the intrinsic value of food crops produced and consumed at home. Optionally,
 
 
 {dlgtab: Graph exporting}
-
-{pmore}
-{cmd:nosave} does not save the generated graph (default behavior is to save). Graph name will start with "bar_LI_gap" and will be followed by "mean" or "median", and include "as_share" and/or "food" as applicable. {p_end}
-
-{pmore}
-{opth subfolder:(text)} (relative) subfolder to save the graph. Default is the current folder. Please make sure name is correct and includes "/" as separator if needed. Folder will be created if necessary. {p_end}
 
 {pmore}
 {cmd:show_graph} shows graph comparing to the benchmark {p_end}
@@ -252,7 +258,7 @@ Please cite it as such:{p_end}
 
 {phang}
 Tyszler, et al. (2020). Living Income Calculations Toolbox. KIT ROYAL TROPICAL 
-INSTITUTE and COSA. Available at: {browse "include_later":m.tyszler@kit.nl} 
+INSTITUTE and COSA. Available at: {browse "https://github.com/mtyszler/KIT_LivingIncome/"} 
 {p_end}
 
 {phang}

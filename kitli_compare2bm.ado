@@ -29,7 +29,7 @@ To view a copy of this license, visit http://creativecommons.org/licenses/by-sa/
 
 -----------------------------------------------------------------------------
 Last Update:
-16/6/2020
+3/07/2020
 
 *****************************************************************************/
 
@@ -45,6 +45,7 @@ program define kitli_compare2bm, sortpreserve
 	colors(string) ///
 	show_graph ///
 	show_detailed_graph ///
+	show_bar_graph ///
 	save_graph_as(string) ///
 	]
 	
@@ -53,6 +54,7 @@ program define kitli_compare2bm, sortpreserve
 	********************************************
 	** Prepare observations which will be used 
 	marksample touse, novarlist
+	qui: replace `touse' = 0 if `varlist' == .
 
 	** color can only be provided if graph is requested:
 	if "`show_graph'" == ""  & "`show_detailed_graph'" == ""  & ("`colors'" !="" | "`ytitle'" !="" | `spacing' !=0.02 | `step_size' != -1 ) {
@@ -61,8 +63,8 @@ program define kitli_compare2bm, sortpreserve
 	
 
 	* Save graph can only be used if graph is requested
-	if "`save_graph_as'" !="" & "`show_detailed_graph'" == ""  & "`show_graph'" == ""   {
-		display as error "WARNING: {it:save_graph_as} will be ignored if neither {it:show_graph} nor {it:show_detailed_graph} are requested."
+	if "`save_graph_as'" !="" & "`show_detailed_graph'" == ""  & "`show_graph'" == ""  & "`show_bar_graph'" == ""   {
+		display as error "WARNING: {it:save_graph_as} will be ignored if neither {it:show_graph} nor {it:show_detailed_graph}  nor {it:show_bar_graph} are requested."
 	}
 
 
@@ -174,7 +176,7 @@ program define kitli_compare2bm, sortpreserve
 			else if r(max) < = 5000 {
 				local w = 200
 			}
-			else if r(max) < = 10000 {
+			else if r(max) < = 20000 {
 				local w = 1000
 			}
 			else if r(max) < = 50000 {
@@ -487,6 +489,50 @@ program define kitli_compare2bm, sortpreserve
 				graph export "`save_graph_as'.png", as(png) width(1000) replace 
 			}
 		}
+
+	}
+
+	if "`show_bar_graph'" !="" {
+
+		local this_ylabel = " ylabel(0(10)100, grid)"
+
+		if "`grouping_var'" !="" {
+			local this_over = ", over(`grouping_var')"
+			local Note_full = ""
+
+			* Append group information:
+			if "`grouping_var'" !="" {
+
+				foreach group in `group_levels' {
+					qui: sum `hh_income' if  `grouping_var' == `group' & `touse'
+					local group_label: label (`grouping_var') `group'
+					local Note_full= `"`Note_full' "N (`group_label') = `r(N)'""'				
+				}
+			}
+		}
+		else {
+			local this_over = ", "
+			qui: sum `hh_income' if `touse'
+			local Note_full = `""N = `r(N)'""'
+		}
+
+		tempvar temp_bm_not_achieved_pct
+		qui: gen `temp_bm_not_achieved_pct' = `temp_bm_not_achieved'*100
+
+		graph bar (mean)  `temp_bm_not_achieved_pct' if `touse'  `this_over' ///
+		stack legend(label(1 "Share of observations below the Living Income Benchmark")) ///
+		ytitle("`ytitle'") `this_ylabel' ///
+		bar(1, color("red")) ///
+		blabel(bar, format(%9.0f) position(center) ) ///
+		graphregion(color(white)) bgcolor(white) ///
+		title("Share of observations below the Living Income Benchmark") ///
+		note(`Note_full')
+
+
+		if "`save_graph_as'" != "" {
+			graph export "`save_graph_as' bar.png", as(png) width(1000) replace 
+		}
+
 
 	}
 	********************************************
