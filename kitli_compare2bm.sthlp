@@ -1,6 +1,6 @@
 {smcl}
-{* *! version 1.0  16june2020}{...}
-{it: v1.0, 16jun2020}
+{* *! version 1.1  03jul2020}{...}
+{it: v1.1, 03jul2020}
 
 {title:Title}
 
