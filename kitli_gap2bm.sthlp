@@ -1,11 +1,11 @@
 {smcl}
 {* *! version 1.0  16june2020}{...}
+{it: v1.0, 16jun2020}
 
 {title:Title}
 
 {phang}
 {bf:(KIT) Living Income Tools} {hline 2} Tables and Bar charts of the Gap to the Living Income Benchmark.
-{it: v1.0, 16jun2020}
 
 
 {marker syntax}{...}
