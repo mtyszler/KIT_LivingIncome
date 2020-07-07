@@ -153,7 +153,7 @@ above the benchmark line. {p_end}
 
 {dlgtab: Labels}
 {pmore}
-{opth label_benchmakr:(text)} Text for benchmark name. If not specified,  {it:Living Income Benchmark} is shown. {p_end}
+{opth label_benchmark:(text)} Text for benchmark name. If not specified,  {it:Living Income Benchmark} is shown. {p_end}
 
 {pmore}
 {opth label_currency:(text)} Text for currency name. If not specified,  {it:USD} is shown. {p_end}
