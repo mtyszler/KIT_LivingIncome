@@ -99,7 +99,10 @@ a detailed graph per group and a combined graph.
 {opt spacing:(number)} Value for spacing between the boxes of the combined graph of all groups. Only relevant if grouping_var:(varname) is provided. Defaults to 0.02 {p_end}
 
 {pmore}
-{opt step_size:(integer)} Value for step size in the x-axis. Bin size for the density calculation is set as half of this value. If ommitted, it is calculated internally. Because the internal calculation might not suit all ranges of values, the user can choose to override its value {p_end}
+{opt step_size:(integer)} Value for step size in the x-axis. Bin size for the density calculation is set as half of this value. 
+If ommitted, it is calculated internally. 
+Because the internal calculation might not suit all ranges of values, 
+the user can choose to override its value {p_end}
 
 {pmore}
 {opt colors:(text)} Colors for the curves. Multiple colors need to be separated by a "|".  Default "ebblue%30 | blue%30 | green%30 | orange%30".  {p_end}
