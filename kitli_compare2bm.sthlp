@@ -28,6 +28,10 @@
 
 {synopt :{opth grouping_var:(varname)}} grouping variable {p_end}
 
+{syntab: Labels}
+
+{synopt :{opt label_benchmark:(text)}} Text for benchmark name. Default "Living Income Benchmark" {p_end}
+
 {syntab: Graph options}
 
 {synopt :{opt ytitle:(text)}} Text for y axis. Default "Proportion of households (%)" {p_end}
@@ -82,6 +86,9 @@ a detailed graph per group and a combined graph.
 {pmore}
 {opth grouping_var:(varname)} grouping variable. If specified, density charts will have one curve per group. {p_end}
 
+{dlgtab: Labels}
+{pmore}
+{opth label_benchmark:(text)} Text for benchmark name. If not specified,  {it:Living Income Benchmark} is shown. {p_end}
 
 {dlgtab: Graph options}
 
