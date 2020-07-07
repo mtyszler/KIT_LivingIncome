@@ -43,8 +43,9 @@
 
 {synopt :{opth grouping_var:(varname)}} grouping variable {p_end}
 
-{syntab: Graph labels}
+{syntab: Labels}
 
+{synopt :{opt label_benchmark:(text)}} Text for benchmark name. Default "Living Income Benchmark" {p_end}
 {synopt :{opt label_currency:(text)}} Text for currency name. Default "USD" {p_end}
 {synopt :{opt label_time:(text)}} Text for time period name. Default "year" {p_end}
 {synopt :{opt label_hh_income:(text)}} Text for total income Default "Total income". Used if {opth main_income:(varname)} is NOT provided {p_end}
@@ -150,7 +151,10 @@ above the benchmark line. {p_end}
 {opth grouping_var:(varname)} grouping variable. If specified, tables will be per group and bar charts will have one bar per group. {p_end}
 
 
-{dlgtab: Graph labels}
+{dlgtab: Labels}
+{pmore}
+{opth label_benchmakr:(text)} Text for benchmark name. If not specified,  {it:Living Income Benchmark} is shown. {p_end}
+
 {pmore}
 {opth label_currency:(text)} Text for currency name. If not specified,  {it:USD} is shown. {p_end}
 
