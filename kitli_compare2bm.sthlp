@@ -38,7 +38,7 @@
 {syntab: Graph exporting}
 
 {synopt :{cmd:show_graph}} shows main graph comparing to the benchmark  {p_end}
-{synopt :{cmd:show_detailed_graph}} shows detailed graphs (per group if gropuing variables is provided) comparing to the benchmark, mean and median values  {p_end}
+{synopt :{cmd:show_detailed_graph}} shows detailed graphs (per group if grouping variables is provided) comparing to the benchmark, mean and median values  {p_end}
 {synopt :{cmd:show_bar_graph}} shows a bar graph of the share below the benchmark  {p_end}
 {synopt :{opt save_graph_as:(text)}} main stub of filename to be saved. Graphs will be saved as png format {p_end}
 
