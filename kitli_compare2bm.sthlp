@@ -63,6 +63,9 @@ a detailed graph per group and a combined graph.
 
 {pstd} {browse "https://docs.wixstatic.com/ugd/0c5ab3_93560a9b816d40c3a28daaa686e972a5.pdf"}
 
+{pstd} This function includes options to customize key elements of the graphs. 
+Please notice, however, that all graphs can be further edited using Stata's {help graph_editor} capabilities. 
+
 
 
 {title:Arguments}

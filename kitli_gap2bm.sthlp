@@ -84,6 +84,9 @@
 
 {pstd} It computes, optionally, the mean or median household income and breaks it down into main income, other income, gap to the living income benchmark. Optionally it includes the intrinsic value of food crops produced and consumed at home. Optionally, it computes the FGT index.
 
+{pstd} This function includes options to customize key elements of the graphs. 
+Please notice, however, that all graphs can be further edited using Stata's {help graph_editor} capabilities. 
+
 
 {title:Arguments}
 
