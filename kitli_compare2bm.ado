@@ -42,6 +42,7 @@ program define kitli_compare2bm, sortpreserve
 	label_benchmark(string) ///
 	ytitle(string) ///
 	spacing(real 0.02) ///
+	placement(string) ///
 	step_size(integer -1) ///
 	colors(string) ///
 	show_graph ///
@@ -59,7 +60,7 @@ program define kitli_compare2bm, sortpreserve
 
 
 	** color can only be provided if graph is requested:
-	if "`show_graph'" == ""  & "`show_detailed_graph'" == ""  & ("`colors'" !="" | "`ytitle'" !="" | `spacing' !=0.02 | `step_size' != -1 ) {
+	if "`show_graph'" == ""  & "`show_detailed_graph'" == ""  & ("`colors'" !="" | "`ytitle'" !="" | `spacing' !=0.02 | `step_size' != -1 | "`placement'" !="" ) {
 		display as error "WARNING: Graph options will be ignored if neither {it:show_graph} nor {it:show_detailed_graph} are requested."
 	}
 	
@@ -84,6 +85,15 @@ program define kitli_compare2bm, sortpreserve
 	capture confirm existence `ytitle'
 	if _rc == 6 {
 		local ytitle = "Proportion of households (%)"
+	}
+
+	capture confirm existence `placement'
+	if _rc == 6 {
+		local placement = "right"
+	}
+
+	if "`placement'" != "right" & "`placement'" != "left" {
+		display as error "WARNING: {it:placement} is provided with value different than {it:right} or {it:left}. This may cause errors in rendering the graph. Consult the help file for valid parameter values"
 	}
 
 	********************************************
@@ -319,7 +329,7 @@ program define kitli_compare2bm, sortpreserve
 					pci 0 `this_mean' `h' `this_mean', color(blue) || ///
 					pci 0 `this_median' `h' `this_median', color(green) ///
 					xtitle("`hh_income_label'") ///
-					text(`h' `li_benchmark_`counter'' "`share_li_`counter'' below the benchmark", place(right)) ///
+					text(`h' `li_benchmark_`counter'' "`share_li_`counter'' below the benchmark", place(`placement')) ///
 					name("detailed_`counter'")
 					
 					if "`save_graph_as'" != "" {
@@ -359,7 +369,7 @@ program define kitli_compare2bm, sortpreserve
 				pci 0 `this_mean' `h' `this_mean', color(blue) || ///
 				pci 0 `this_median' `h' `this_median', color(green) ///
 				xtitle("`hh_income_label'") ///
-				text(`h' `li_benchmark_`counter'' "`share_li_`counter'' below the benchmark", place(right)) ///
+				text(`h' `li_benchmark_`counter'' "`share_li_`counter'' below the benchmark", place(`placement')) ///
 				name("detailed_all_groups")
 				
 				if "`save_graph_as'" != "" {
@@ -398,7 +408,7 @@ program define kitli_compare2bm, sortpreserve
 				pci 0 `this_mean' `h' `this_mean', color(blue) || ///
 				pci 0 `this_median' `h' `this_median', color(green) ///
 				xtitle("`hh_income_label'") ///
-				text(`h' `li_benchmark_`counter'' "`share_li_`counter'' below the benchmark", place(right)) ///
+				text(`h' `li_benchmark_`counter'' "`share_li_`counter'' below the benchmark", place(`placement')) ///
 				name("detailed")
 				
 				if "`save_graph_as'" != "" {
@@ -466,7 +476,7 @@ program define kitli_compare2bm, sortpreserve
 							gettoken this_color all_colors: all_colors, parse("|")
 						}
 						local group_bm_line = "`group_bm_line' || pci 0 `li_benchmark_`counter'' `h_`counter'' `li_benchmark_`counter'', color(`this_color')"
-						local group_bm_box = `"`group_bm_box' text(`h_`counter'' `li_benchmark_`counter'' "Living Income `group_label': `share_li_`counter'' below", size(small)  place(right) box margin(1 1 1 1) fcolor(`this_color'))"'
+						local group_bm_box = `"`group_bm_box' text(`h_`counter'' `li_benchmark_`counter'' "Living Income `group_label': `share_li_`counter'' below", size(small)  place(`placement') box margin(1 1 1 1) fcolor(`this_color'))"'
 					
 						local counter = `counter'+1
 				
@@ -477,7 +487,7 @@ program define kitli_compare2bm, sortpreserve
 			else {
 				gettoken this_color all_colors: all_colors, parse("|")
 				local group_bm_line = " || pci 0 `li_benchmark_1' `h_1' `li_benchmark_1', color(`this_color')"
-		        local group_bm_box = `" text(`h_1' `li_benchmark_1' "`label_benchmark': `share_li_1' below", size(small)  place(right) box margin(1 1 1 1) fcolor(`this_color'))"'
+		        local group_bm_box = `" text(`h_1' `li_benchmark_1' "`label_benchmark': `share_li_1' below", size(small)  place(`placement') box margin(1 1 1 1) fcolor(`this_color'))"'
 			}
 
 

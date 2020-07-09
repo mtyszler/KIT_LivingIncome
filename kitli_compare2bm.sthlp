@@ -36,6 +36,7 @@
 
 {synopt :{opt ytitle:(text)}} Text for y axis. Default "Proportion of households (%)" {p_end}
 {synopt :{opt spacing:(number)}} Value for spacing between the boxes of the combined graph of all groups. Defaults to 0.02 {p_end}
+{synopt :{opt placement:(text)}} Placement of the boxes of the indicating the share of those below the benchmark. Defaults to {it:right}. {p_end}
 {synopt :{opt step_size:(integer)}} Value for step size in the x-axis. Defaults to a value calculated internally {p_end}
 {synopt :{opt colors:(text)}} String with colors for the graph. Default "ebblue%30 | blue%30 | green%30 | orange%30" {p_end}
 
@@ -97,6 +98,11 @@ a detailed graph per group and a combined graph.
 
 {pmore}
 {opt spacing:(number)} Value for spacing between the boxes of the combined graph of all groups. Only relevant if grouping_var:(varname) is provided. Defaults to 0.02 {p_end}
+
+{pmore}
+{opt placement:(text)} Placement of the boxes/text in the graphs. Defaults to {it:right}, i.e., the boxes are placed to the right of the benchmark line. 
+Typically, one might want to use {it:left} as an alternative, if the text gets cut-off to the right. 
+See {help compassdirstyle} for more valid options.  {p_end}
 
 {pmore}
 {opt step_size:(integer)} Value for step size in the x-axis. Bin size for the density calculation is set as half of this value. 
