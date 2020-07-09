@@ -546,7 +546,7 @@ program define kitli_gap2bm, sortpreserve
 
 		if "`metric'" == "FGT" {
 			graph bar (mean)  `temp_gap2benchmark' if `touse'  `this_over' ///
-			stack legend(label(1 "FGT index")) ///
+			stack legend(label(1 "FGT index")  size(vsmall)) ///
 			ytitle("`this_ytitle'") `this_ylabel' ///
 			bar(1, color(`color_gap')) ///
 			blabel(bar, format(%9.0f) position(center) ) ///
@@ -558,7 +558,7 @@ program define kitli_gap2bm, sortpreserve
 		else if "`main_income'" != "" {  
 			if "`food_value'" == "" { // no food
 				graph bar (mean) `temp_mainincome' `temp_other_than_main'  `temp_gap2benchmark' if `touse'  `this_over' ///
-				stack legend(label(1 "`label_main_income'") label(2 "`label_other_than_main_income'") label(3 "Gap to the `label_benchmark'")) ///
+				stack legend(label(1 "`label_main_income'") label(2 "`label_other_than_main_income'") label(3 "Gap to the `label_benchmark'") size(vsmall)) ///
 				ytitle("`this_ytitle'") `this_ylabel' ///
 				bar(1, color(`color_main_income')) ///
 				bar(2, color(`color_other_than_main_income')) ///
@@ -585,7 +585,7 @@ program define kitli_gap2bm, sortpreserve
 		else {
 			if "`food_value'" == "" { // no food
 				graph bar (mean) `temp_totalincome'  `temp_gap2benchmark' if `touse'  `this_over' ///
-				stack legend(label(1 "`label_hh_income'") label(2 "Gap to the `label_benchmark'")) ///
+				stack legend(label(1 "`label_hh_income'") label(2 "Gap to the `label_benchmark'")  size(vsmall)) ///
 				ytitle("`this_ytitle'")  `this_ylabel' ///
 				bar(1, color(`color_hh_income')) ///
 				bar(2, color(`color_gap')) ///
