@@ -476,7 +476,7 @@ program define kitli_compare2bm, sortpreserve
 							gettoken this_color all_colors: all_colors, parse("|")
 						}
 						local group_bm_line = "`group_bm_line' || pci 0 `li_benchmark_`counter'' `h_`counter'' `li_benchmark_`counter'', color(`this_color')"
-						local group_bm_box = `"`group_bm_box' text(`h_`counter'' `li_benchmark_`counter'' "Living Income `group_label': `share_li_`counter'' below", size(small)  place(`placement') box margin(1 1 1 1) fcolor(`this_color'))"'
+						local group_bm_box = `"`group_bm_box' text(`h_`counter'' `li_benchmark_`counter'' "`label_benchmark' `group_label': `share_li_`counter'' below", size(small)  place(`placement') box margin(1 1 1 1) fcolor(`this_color'))"'
 					
 						local counter = `counter'+1
 				
