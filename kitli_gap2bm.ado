@@ -522,7 +522,7 @@ program define kitli_gap2bm, sortpreserve
 	* Generate graphs
 	if "`show_graph'" !="" {
 
-		** preare notes for the graphs:
+		** prepare notes for the graphs:
 		if "`grouping_var'" !="" { 
 
 			local Note_full = `""Based on:""'
