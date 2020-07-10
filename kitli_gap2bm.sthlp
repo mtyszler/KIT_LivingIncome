@@ -256,6 +256,30 @@ above the benchmark line. {p_end}
 ({stata "kitli_gap2bm benchmark, hh_income (total_hh_income_2018) main_income(total_cocoa_income_2018) food_value(food_value) grouping_var(grouping) show_graph":{it:click to run}}) 
 {p_end}
 
+{title:Saved results}
+
+{pstd}
+{cmd:kitli_gap2bm} saves the following in {cmd:r()}, depending on the options provided:
+
+{synoptset 20 tabbed}{...}
+{p2col 5 35 24 2: Scalars}{p_end}
+{pmore}
+{it: If groups are provided, the results names are appended with the group number} {p_end}
+
+{synopt:{cmd:r(N)}}number of observations{p_end}
+{synopt:{cmd:r(main_income)}} mean or median of the main income{p_end}
+{synopt:{cmd:r(other_than_main_income)}} mean or median of the other than main income{p_end}
+{synopt:{cmd:r(total_income)}} mean or median of the total income{p_end}
+{synopt:{cmd:r(food_value)}} mean or median of the intrinsic value of food produced and consumed at home{p_end}
+{synopt:{cmd:r(gap)}} mean or median of gap to the benchmark value{p_end}
+{synopt:{cmd:r(FGT)}} FGT index{p_end}
+{synopt:{cmd:r(benchmark)}} mean or median of the benchmark value{p_end}
+
+
+{p2col 5 20 24 2: Macros}{p_end}
+{synopt:{cmd:r(metric)}}metric calculated: mean, median of FGT{p_end}
+{synopt:{cmd:r(calculation)}}level or share{p_end}
+{synopt:{cmd:r(grouping_var)}}variable used for groupings{p_end}
 
 
 {title:Citation}

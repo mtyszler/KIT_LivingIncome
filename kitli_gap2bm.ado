@@ -36,7 +36,7 @@ Last Update:
 
 version 13 
 capture program drop kitli_gap2bm
-program define kitli_gap2bm, sortpreserve
+program define kitli_gap2bm, sortpreserve rclass
 	syntax varname(numeric) [if] [in], ///
 	hh_income(varname numeric) ///
 	[main_income(varname numeric) ///
@@ -385,12 +385,24 @@ program define kitli_gap2bm, sortpreserve
 	
 	 	
 	********************************************
-	* display table with results
+	* display table with results (and store in r-class)
+
+	return local metric = "`metric'"
+
+	if "`metric'" != "FGT" {
+		if "`as_share'" == "as_share" {
+			return local calculation = "share"
+		}
+		else {
+			return local calculation = "level"
+		}
+	}
 
 	display in b _newline
 	display in b "`text_tbl'" 
 
 	if "`grouping_var'" !="" { // show per group
+		return local grouping_var = "`grouping_var'"
 
 		qui: levelsof `grouping_var' if `touse', local(group_levels)
 
@@ -400,6 +412,7 @@ program define kitli_gap2bm, sortpreserve
 			local group_label: label (`grouping_var') `group'
 	
 			qui: sum `temp_gap2benchmark' if `grouping_var' == `group' & `touse' 
+			return scalar N_`group' = `r(N)'
 			display in b ""
 			display in b "`group_label'" 
 			display in b "n = `r(N)'"
@@ -410,17 +423,20 @@ program define kitli_gap2bm, sortpreserve
 			if "`metric'" != "FGT" { // mean of median
 				if "`main_income'" != "" {
 					qui: sum `temp_mainincome' if `grouping_var' == `group' & `touse' 
+					return scalar main_income_`group' = `r(mean)'
 					display as text %35s "`label_main_income':" /*
 									*/ as result /*
 									*/ %9.0f `r(mean)' "`show_pct'"
 
 					qui: sum `temp_other_than_main' if `grouping_var' == `group' & `touse' 
+					return scalar other_than_main_income_`group' = `r(mean)'
 					display as text %35s "`label_other_than_main_income':" /*
 									*/ as result /*
 									*/ %9.0f `r(mean)' "`show_pct'"
 				}
 				else {
-					qui: sum `temp_totalincome' if `grouping_var' == `group' & `touse' 
+					qui: sum `temp_totalincome' if `grouping_var' == `group' & `touse'
+					return scalar total_income_`group' = `r(mean)' 
 					display as text %35s "`label_hh_income':" /*
 									*/ as result /*
 									*/ %9.0f `r(mean)' "`show_pct'"
@@ -428,6 +444,7 @@ program define kitli_gap2bm, sortpreserve
 
 				if "`food_value'" != "" {
 					qui: sum `temp_foodvalue' if `grouping_var' == `group' & `touse' 
+					return scalar food_value_`group' = `r(mean)' 
 					display as text %35s "`label_food_value':" /*
 									*/ as result /*
 									*/ %9.0f `r(mean)' "`show_pct'"
@@ -435,12 +452,14 @@ program define kitli_gap2bm, sortpreserve
 
 
 				qui: sum `temp_gap2benchmark' if `grouping_var' == `group' & `touse' 
+				return scalar gap_`group' = `r(mean)' 
 				display as text %35s "Gap to the `label_benchmark':" /*
 								*/ as result /*
 								*/ %9.0f `r(mean)' "`show_pct'"
 			}
 			else { //FGT
 				qui: sum `temp_gap2benchmark' if `grouping_var' == `group' & `touse' 
+				return scalar FGT_`group' = `r(mean)' 
 				display as text %35s "FGT index:" /*
 								*/ as result /*
 								*/ %9.0f `r(mean)' "%"
@@ -452,6 +471,7 @@ program define kitli_gap2bm, sortpreserve
 				display as text %35s "" as text "`benchmark_unit'"
 			}
 			qui: sum `temp_benchmark' if `grouping_var' == `group' & `touse'
+			return scalar benchmark_`group' = `r(mean)' 
 			display as text %35s "`label_benchmark'" /*
 							*/ as result /*
 							*/ %9.0f `r(mean)' 
@@ -462,6 +482,7 @@ program define kitli_gap2bm, sortpreserve
 	else { // no groups
 
 		qui: sum `temp_gap2benchmark' if  `touse' 
+		return scalar N = `r(N)'
 		display in b ""
 		display in b "n = `r(N)'"
 		display in b ""
@@ -471,24 +492,28 @@ program define kitli_gap2bm, sortpreserve
 		if "`metric'" != "FGT" { // mean of median
 			if "`main_income'" != "" {
 				qui: sum `temp_mainincome' if  `touse' 
+				return scalar main_income = `r(mean)'
 				display as text %35s "`label_main_income':" /*
 								*/ as result /*
 								*/ %9.0f `r(mean)' "`show_pct'"
 
 				qui: sum `temp_other_than_main' if `touse' 
+				return scalar other_than_main_income = `r(mean)'
 				display as text %35s "`label_other_than_main_income':" /*
 								*/ as result /*
 								*/ %9.0f `r(mean)' "`show_pct'"
 			}
 			else {
 				qui: sum `temp_totalincome' if  `touse' 
+				return scalar total_income = `r(mean)'
 				display as text %35s "`label_hh_income':" /*
 								*/ as result /*
 								*/ %9.0f `r(mean)' "`show_pct'"
 			}
 
 			if "`food_value'" != "" {
-				qui: sum `temp_foodvalue' if  `touse' 
+				qui: sum `temp_foodvalue' if  `touse'
+				return scalar food_value = `r(mean)' 
 				display as text %35s "`label_food_value':" /*
 								*/ as result /*
 								*/ %9.0f `r(mean)' "`show_pct'"
@@ -496,12 +521,14 @@ program define kitli_gap2bm, sortpreserve
 
 
 			qui: sum `temp_gap2benchmark' if `touse' 
+			return scalar gap = `r(mean)' 
 			display as text %35s "Gap to the `label_benchmark':" /*
 							*/ as result /*
 							*/ %9.0f `r(mean)' "`show_pct'"
 		}
 		else { //FGT
 			qui: sum `temp_gap2benchmark' if `touse' 
+			return scalar FGT = `r(mean)' 
 			display as text %35s "FGT index:" /*
 							*/ as result /*
 							*/ %9.0f `r(mean)' "%"
@@ -513,6 +540,7 @@ program define kitli_gap2bm, sortpreserve
 			display as text %35s "" as text "`benchmark_unit'"
 		}
 		qui: sum `temp_benchmark' if  `touse'
+		return scalar benchmark = `r(mean)' 
 		display as text %35s "`label_benchmark'" /*
 						*/ as result /*
 						*/ %9.0f `r(mean)' 
