@@ -203,7 +203,7 @@ above the benchmark line. {p_end}
 {cmd:show_graph} shows graph comparing to the benchmark {p_end}
 
 {pmore}
-{opt save_graph_as:(text)} main stub of filename to be saved. Graphs will be saved as png format. {p_end}
+{opt save_graph_as:(text)} main stub of filename to be saved. Graphs will be saved as png format (appended to the filename). {p_end}
 
 
 
