@@ -518,7 +518,7 @@ program define kitli_compare2bm, sortpreserve
 
 			* save graph *
 			if "`save_graph_as'" != "" {
-				graph export "`save_graph_as'.png", as(png) width(1000) replace 
+				graph export "`save_graph_as' distribution.png", as(png) width(1000) replace 
 			}
 		}
 

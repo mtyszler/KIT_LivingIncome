@@ -136,8 +136,11 @@ comparing to the benchmark {p_end}
 {cmd:show_bar_graph} shows a bar graph with the share of those below the benchmark, per group if groups are provided. {p_end}
 
 {pmore}
-{opt save_graph_as:(text)} Main stub for graph saving. Graphs are in png format. Detailed graphs have the word {it: detailed} appended, 
-the bar graph has the word {it: bar} appended and group graphs have the group label appended to the file name. {p_end}
+{opt save_graph_as:(text)} Main stub for the filename used for saving the graphs. Graphs are in png format (appended to the filename). 
+Distribution graphs have the word {it:distribution} appended,
+detailed graphs have the word {it: detailed} appended,
+and bar graphs have the word {it: bar} appended. 
+Finally,  group graphs have the group label appended to the file name. {p_end}
 
 
 
