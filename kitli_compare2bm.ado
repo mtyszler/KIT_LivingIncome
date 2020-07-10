@@ -35,7 +35,7 @@ Last Update:
 
 version 13 
 capture program drop kitli_compare2bm
-program define kitli_compare2bm, sortpreserve
+program define kitli_compare2bm, sortpreserve rclass
 	syntax varname(numeric) [if] [in], ///
 	hh_income(varname numeric) ///
 	[grouping_var(varname numeric) ///
@@ -567,13 +567,14 @@ program define kitli_compare2bm, sortpreserve
 
 
 	}
-	********************************************
-	* display table with results
+	***************************************************
+	* display table with results (and store in r-class)
 
 	display in b _newline
 	display in b "Share of observations below the `label_benchmark'" 
 
 	if "`grouping_var'" !="" { // show per group, than total
+		return local grouping_var = "`grouping_var'"
 
 		** per groups
 		foreach group in `group_levels' {
@@ -582,6 +583,8 @@ program define kitli_compare2bm, sortpreserve
 	
 			qui: sum `temp_bm_not_achieved' if `grouping_var' == `group' & `touse' 
 			local share_li = `r(mean)'*100
+			return scalar share_below_`group' = `share_li'
+			return scalar N_`group' = `r(N)'
 			display in b ""
 			display in b "`group_label'" 
 			display in b "n = `r(N)'"
@@ -595,6 +598,8 @@ program define kitli_compare2bm, sortpreserve
 		** all groups together
 		qui: sum `temp_bm_not_achieved' if `grouping_var' != . & `touse' 
 		local share_li = `r(mean)'*100
+		return scalar share_below = `share_li'
+		return scalar N = `r(N)'
 		display in b ""
 		display in b "All groups"
 		display in b "n = `r(N)'"
@@ -608,6 +613,8 @@ program define kitli_compare2bm, sortpreserve
 
 		qui: sum `temp_bm_not_achieved' if  `touse' 
 		local share_li = `r(mean)'*100
+		return scalar share_below = `share_li'
+		return scalar N = `r(N)'
 		display in b ""
 		display in b "n = `r(N)'"
 		display in b ""

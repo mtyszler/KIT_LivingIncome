@@ -166,6 +166,22 @@ Finally,  group graphs have the group label appended to the file name. {p_end}
 {phang}{cmd:. kitli_compare2bm benchmark, hh_income(total_hh_income_2018)  grouping_var(grouping) show_detailed_graph}
 ({stata "kitli_compare2bm benchmark, hh_income(total_hh_income_2018)  grouping_var(grouping) show_detailed_graph":{it:click to run}}) {p_end}
 
+{title:Saved results}
+
+{pstd}
+{cmd:kitli_compare2bm} saves the following in {cmd:r()}, depending on the options provided:
+
+{synoptset 20 tabbed}{...}
+{p2col 5 35 24 2: Scalars}{p_end}
+{pmore}
+{it: If groups are provided, the results names are appended with the group number} {p_end}
+
+{synopt:{cmd:r(N)}}number of observations{p_end}
+{synopt:{cmd:r(share_below)}}share of those below the benchmark{p_end}
+
+{p2col 5 20 24 2: Macros}{p_end}
+{synopt:{cmd:r(grouping_var)}}variable used for groupings{p_end}
+
 
 {title:Citation}
 {phang}
