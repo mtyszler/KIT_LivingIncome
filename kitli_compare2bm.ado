@@ -238,6 +238,11 @@ program define kitli_compare2bm, sortpreserve
 				capture drop temp_x_`group' temp_y_`group'	
 				capture tempvar temp_x_`group' temp_y_`group'
 				kdensity `hh_income' if `grouping_var' == `group' & `touse', gen(`temp_x_`group'' `temp_y_`group'') nograph kernel(gaus) `extras'
+				if `r(scale)' == . {
+					display as error "ERROR: density estimation failed. Please check variables provided, and/or provide a different step size for estimation"
+					error 321
+					exit
+				}
 				qui: replace `temp_y_`group'' = `temp_y_`group''*`r(scale)'
 				qui: sum `temp_y_`group''
 				local current_max = max(`r(max)',`current_max')
@@ -262,9 +267,19 @@ program define kitli_compare2bm, sortpreserve
 		capture tempvar temp_x temp_y
 		if "`grouping_var'" !="" {
 			kdensity `hh_income' if `touse' & `grouping_var' !=., gen(`temp_x' `temp_y') nograph kernel(gaus) `extras'
+				if `r(scale)' == . {
+					display as error "ERROR: density estimation failed. Please check variables provided, and/or provide a different step size for estimation"
+					error 321
+					exit
+				}
 		} 
 		else {
 			qui: kdensity `hh_income' if `touse' , gen(`temp_x' `temp_y') nograph kernel(gaus) `extras'
+				if `r(scale)' == . {
+					display as error "ERROR: density estimation failed. Please check variables provided, and/or provide a different step size for estimation"
+					error 321
+					exit
+				}
 		}
 		qui: replace `temp_y' = `temp_y'*`r(scale)'
 		qui: sum `temp_y'
