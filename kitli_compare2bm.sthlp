@@ -43,7 +43,9 @@
 {syntab: Graph exporting}
 
 {synopt :{cmd:show_graph}} shows main graph comparing to the benchmark  {p_end}
-{synopt :{cmd:show_detailed_graph}} shows detailed graphs (per group if grouping variables is provided) comparing to the benchmark, mean and median values  {p_end}
+{synopt :{cmd:show_detailed_graph}} shows detailed graphs 
+(separated graphs per group if grouping variables is provided) 
+comparing to the benchmark, mean and median values  {p_end}
 {synopt :{cmd:show_bar_graph}} shows a bar graph of the share below the benchmark  {p_end}
 {synopt :{opt save_graph_as:(text)}} main stub of filename to be saved. Graphs will be saved as png format {p_end}
 
@@ -125,7 +127,8 @@ the user can choose to override its value {p_end}
 {cmd:show_graph} shows the main graph, all (groups) compared to the benchmark {p_end}
 
 {pmore}
-{cmd:show_detailed_graph} shows the detailed graphs, i.e. distribution, benchmark, mean and median, per group if groups as provided. {p_end}
+{cmd:show_detailed_graph} shows the detailed graphs, i.e. distribution, benchmark, mean and median, as separated graphs 
+per group if groups are provided. {p_end}
 
 {pmore}
 {cmd:show_bar_graph} shows a bar graph with the share of those below the benchmark, per group if groups as provided. {p_end}
