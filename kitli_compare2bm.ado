@@ -570,6 +570,9 @@ program define kitli_compare2bm, sortpreserve rclass
 	***************************************************
 	* display table with results (and store in r-class)
 
+	local txt_spacing = 35
+	local txt_spacing = max(`txt_spacing', strlen("Below the `label_benchmark': "))
+
 	display in b _newline
 	display in b "Share of observations below the `label_benchmark'" 
 
@@ -589,7 +592,7 @@ program define kitli_compare2bm, sortpreserve rclass
 			display in b "`group_label'" 
 			display in b "n = `r(N)'"
 			display in b ""
-			display as text %35s "Below the `label_benchmark': " /*
+			display as text %`txt_spacing's "Below the `label_benchmark': " /*
 				*/ as result /*
 				*/ %9.1f `share_li' "%"
 			di as text "{hline 73}"
@@ -604,7 +607,7 @@ program define kitli_compare2bm, sortpreserve rclass
 		display in b "All groups"
 		display in b "n = `r(N)'"
 		display in b ""
-		display as text %35s "Below the `label_benchmark': " /*
+		display as text %`txt_spacing's "Below the `label_benchmark': " /*
 			*/ as result /*
 			*/ %9.1f `share_li' "%"
 		di as text "{hline 73}"
@@ -618,7 +621,7 @@ program define kitli_compare2bm, sortpreserve rclass
 		display in b ""
 		display in b "n = `r(N)'"
 		display in b ""
-		display as text %35s "Below the `label_benchmark': " /*
+		display as text %`txt_spacing's "Below the `label_benchmark': " /*
 			*/ as result /*
 			*/ %9.1f `share_li' "%"
 		di as text "{hline 73}"
