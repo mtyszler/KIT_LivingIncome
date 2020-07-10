@@ -131,7 +131,7 @@ the user can choose to override its value {p_end}
 per group if groups are provided. {p_end}
 
 {pmore}
-{cmd:show_bar_graph} shows a bar graph with the share of those below the benchmark, per group if groups as provided. {p_end}
+{cmd:show_bar_graph} shows a bar graph with the share of those below the benchmark, per group if groups are provided. {p_end}
 
 {pmore}
 {opt save_graph_as:(text)} Main stub for graph saving. Graphs are in png format. Detailed graphs have the word {it: detailed} appended, 
