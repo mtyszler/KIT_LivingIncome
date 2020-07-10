@@ -45,7 +45,7 @@ program define kitli_compare2bm, sortpreserve
 	placement(string) ///
 	step_size(integer -1) ///
 	colors(string) ///
-	show_graph ///
+	show_distribution_graph ///
 	show_detailed_graph ///
 	show_bar_graph ///
 	save_graph_as(string) ///
@@ -60,14 +60,14 @@ program define kitli_compare2bm, sortpreserve
 
 
 	** color can only be provided if graph is requested:
-	if "`show_graph'" == ""  & "`show_detailed_graph'" == ""  & ("`colors'" !="" | "`ytitle'" !="" | `spacing' !=0.02 | `step_size' != -1 | "`placement'" !="" ) {
-		display as error "WARNING: Graph options will be ignored if neither {it:show_graph} nor {it:show_detailed_graph} are requested."
+	if "`show_distribution_graph'" == ""  & "`show_detailed_graph'" == ""  & ("`colors'" !="" | "`ytitle'" !="" | `spacing' !=0.02 | `step_size' != -1 | "`placement'" !="" ) {
+		display as error "WARNING: Graph options will be ignored if neither {it:show_distribution_graph} nor {it:show_detailed_graph} are requested."
 	}
 	
 
 	* Save graph can only be used if graph is requested
-	if "`save_graph_as'" !="" & "`show_detailed_graph'" == ""  & "`show_graph'" == ""  & "`show_bar_graph'" == ""   {
-		display as error "WARNING: {it:save_graph_as} will be ignored if neither {it:show_graph} nor {it:show_detailed_graph}  nor {it:show_bar_graph} are requested."
+	if "`save_graph_as'" !="" & "`show_detailed_graph'" == ""  & "`show_distribution_graph'" == ""  & "`show_bar_graph'" == ""   {
+		display as error "WARNING: {it:save_graph_as} will be ignored if neither {it:show_distribution_graph} nor {it:show_detailed_graph}  nor {it:show_bar_graph} are requested."
 	}
 
 
@@ -137,7 +137,7 @@ program define kitli_compare2bm, sortpreserve
 	}
 
 	********************************************
-	if "`show_graph'" !="" | "`show_detailed_graph'" !="" | {
+	if "`show_distribution_graph'" !="" | "`show_detailed_graph'" !="" | {
 
 		local Note_full = `""N (All) = `r(N)'""'
 		local labels_cmd = `"label( 1 "All") "'
@@ -434,7 +434,7 @@ program define kitli_compare2bm, sortpreserve
 		}
 
 
-		if "`show_graph'" !="" | {
+		if "`show_distribution_graph'" !="" | {
 			** All together
 			** Decide on the heights, ordering by benchmark value:
 			if "`grouping_var'" !="" {

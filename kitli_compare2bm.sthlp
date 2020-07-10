@@ -5,7 +5,8 @@
 {title:Title}
 
 {phang}
-{bf:(KIT) Living Income Tools} {hline 2} Tables and density (kernel smoothened) plots about the total household income with the goal of comparing to the benchmark value, optionally by groups.
+{bf:(KIT) Living Income Tools} {hline 2} Tables, density (kernel smoothened) and bar plots about 
+the total household income with the goal of comparing to the benchmark value, optionally by groups.
 
 {marker syntax}{...}
 {title:Syntax}
@@ -42,10 +43,10 @@
 
 {syntab: Graph exporting}
 
-{synopt :{cmd:show_graph}} shows main graph comparing to the benchmark  {p_end}
-{synopt :{cmd:show_detailed_graph}} shows detailed graphs 
+{synopt :{cmd:show_distribution_graph}} shows a distribution graph comparing to the benchmark  {p_end}
+{synopt :{cmd:show_detailed_graph}} shows detailed distribution graphs 
 (separated graphs per group if grouping variables is provided) 
-comparing to the benchmark, mean and median values  {p_end}
+comparing to the benchmark, including mean and median values  {p_end}
 {synopt :{cmd:show_bar_graph}} shows a bar graph of the share below the benchmark  {p_end}
 {synopt :{opt save_graph_as:(text)}} main stub of filename to be saved. Graphs will be saved as png format {p_end}
 
@@ -124,11 +125,12 @@ the user can choose to override its value {p_end}
 {dlgtab: Graph exporting}
 
 {pmore}
-{cmd:show_graph} shows the main graph, all (groups) compared to the benchmark {p_end}
+{cmd:show_distribution_graph} shows a distribution graph (with groups overlayed, if provided), 
+comparing to the benchmark {p_end}
 
 {pmore}
-{cmd:show_detailed_graph} shows the detailed graphs, i.e. distribution, benchmark, mean and median, as separated graphs 
-per group if groups are provided. {p_end}
+{cmd:show_detailed_graph} shows detailed distribution graphs, i.e. distribution, benchmark, mean and median values
+, as separated graphs per group if groups are provided. {p_end}
 
 {pmore}
 {cmd:show_bar_graph} shows a bar graph with the share of those below the benchmark, per group if groups are provided. {p_end}
