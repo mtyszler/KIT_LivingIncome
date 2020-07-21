@@ -24,8 +24,6 @@ Carlos de los Rios. COSA. cd@thecosa.org
 
 #### Other Contributors
 
-Carlos de los Rios. COSA. cd@thecosa.org
-
 Elena Serfilippi. KIT Royal Tropical Institute, Netherlands.
 
 Esther Smits. KIT Royal Tropical Institute, Netherlands.
