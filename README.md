@@ -2,7 +2,7 @@
 [![License: CC BY-SA 4.0](https://img.shields.io/badge/License-CC%20BY--SA%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by-sa/4.0/)
 
 ## Developed by [KIT](http://www.kit.nl) and [COSA](http://thecosa.org/)
-[Last update 3/7/2020] 
+[Last update 21/7/2020] 
 
 `kit_livingincome` provides stata ado-files to produce tables and charts of the Gap to the Living Income Benchmark.
  
@@ -21,6 +21,15 @@ https://www.living-income.com/papersandreports
 Marcelo Tyszler. KIT Royal Tropical Institute, Netherlands. m.tyszler@kit.nl
 
 Carlos de los Rios. COSA. cd@thecosa.org
+
+#### Other Contributors
+
+Elena Serfilippi. KIT Royal Tropical Institute, Netherlands.
+
+Esther Smits. KIT Royal Tropical Institute, Netherlands.
+
+Suchitra Yegna Narayan. Laudes Foundation
+
 
 ### Requirements
 
@@ -76,7 +85,7 @@ or
 help kitli_compare2bm
 ```
 
-And take notice of the version and date at the top. The latest version is _v1.1, 03jul2020_
+And take notice of the version and date at the top. The latest version is _v1.2, 21jul2020_
 
 ## Citation
 

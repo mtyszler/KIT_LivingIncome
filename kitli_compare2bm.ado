@@ -29,21 +29,23 @@ To view a copy of this license, visit http://creativecommons.org/licenses/by-sa/
 
 -----------------------------------------------------------------------------
 Last Update:
-3/07/2020
+21/07/2020
 
 *****************************************************************************/
 
 version 13 
 capture program drop kitli_compare2bm
-program define kitli_compare2bm, sortpreserve
+program define kitli_compare2bm, sortpreserve rclass
 	syntax varname(numeric) [if] [in], ///
 	hh_income(varname numeric) ///
 	[grouping_var(varname numeric) ///
+	label_benchmark(string) ///
 	ytitle(string) ///
 	spacing(real 0.02) ///
+	placement(string) ///
 	step_size(integer -1) ///
 	colors(string) ///
-	show_graph ///
+	show_distribution_graph ///
 	show_detailed_graph ///
 	show_bar_graph ///
 	save_graph_as(string) ///
@@ -56,19 +58,25 @@ program define kitli_compare2bm, sortpreserve
 	marksample touse, novarlist
 	qui: replace `touse' = 0 if `varlist' == .
 
+
 	** color can only be provided if graph is requested:
-	if "`show_graph'" == ""  & "`show_detailed_graph'" == ""  & ("`colors'" !="" | "`ytitle'" !="" | `spacing' !=0.02 | `step_size' != -1 ) {
-		display as error "WARNING: Graph options will be ignored if neither {it:show_graph} nor {it:show_detailed_graph} are requested."
+	if "`show_distribution_graph'" == ""  & "`show_detailed_graph'" == ""  & ("`colors'" !="" | "`ytitle'" !="" | `spacing' !=0.02 | `step_size' != -1 | "`placement'" !="" ) {
+		display as error "WARNING: Graph options will be ignored if neither {it:show_distribution_graph} nor {it:show_detailed_graph} are requested."
 	}
 	
 
 	* Save graph can only be used if graph is requested
-	if "`save_graph_as'" !="" & "`show_detailed_graph'" == ""  & "`show_graph'" == ""  & "`show_bar_graph'" == ""   {
-		display as error "WARNING: {it:save_graph_as} will be ignored if neither {it:show_graph} nor {it:show_detailed_graph}  nor {it:show_bar_graph} are requested."
+	if "`save_graph_as'" !="" & "`show_detailed_graph'" == ""  & "`show_distribution_graph'" == ""  & "`show_bar_graph'" == ""   {
+		display as error "WARNING: {it:save_graph_as} will be ignored if neither {it:show_distribution_graph} nor {it:show_detailed_graph}  nor {it:show_bar_graph} are requested."
 	}
 
 
-	** load defaults in case optional arguments are skipped:	
+	** load defaults in case optional arguments are skipped:
+	capture confirm existence `label_benchmark'	
+	if _rc == 6 {
+		local label_benchmark = "Living Income Benchmark"
+	}
+
 	capture confirm existence `colors'
 	if _rc == 6 {
 		local colors = "ebblue%30 | blue%30 | green%30 | orange%30"
@@ -77,6 +85,15 @@ program define kitli_compare2bm, sortpreserve
 	capture confirm existence `ytitle'
 	if _rc == 6 {
 		local ytitle = "Proportion of households (%)"
+	}
+
+	capture confirm existence `placement'
+	if _rc == 6 {
+		local placement = "right"
+	}
+
+	if "`placement'" != "right" & "`placement'" != "left" {
+		display as error "WARNING: {it:placement} is provided with value different than {it:right} or {it:left}. This may cause errors in rendering the graph. Consult the help file for valid parameter values"
 	}
 
 	********************************************
@@ -120,7 +137,7 @@ program define kitli_compare2bm, sortpreserve
 	}
 
 	********************************************
-	if "`show_graph'" !="" | "`show_detailed_graph'" !="" | {
+	if "`show_distribution_graph'" !="" | "`show_detailed_graph'" !="" | {
 
 		local Note_full = `""N (All) = `r(N)'""'
 		local labels_cmd = `"label( 1 "All") "'
@@ -221,6 +238,11 @@ program define kitli_compare2bm, sortpreserve
 				capture drop temp_x_`group' temp_y_`group'	
 				capture tempvar temp_x_`group' temp_y_`group'
 				kdensity `hh_income' if `grouping_var' == `group' & `touse', gen(`temp_x_`group'' `temp_y_`group'') nograph kernel(gaus) `extras'
+				if `r(scale)' == . {
+					display as error "ERROR: density estimation failed. Please check variables provided, and/or provide a different step size for estimation"
+					error 321
+					exit
+				}
 				qui: replace `temp_y_`group'' = `temp_y_`group''*`r(scale)'
 				qui: sum `temp_y_`group''
 				local current_max = max(`r(max)',`current_max')
@@ -245,9 +267,19 @@ program define kitli_compare2bm, sortpreserve
 		capture tempvar temp_x temp_y
 		if "`grouping_var'" !="" {
 			kdensity `hh_income' if `touse' & `grouping_var' !=., gen(`temp_x' `temp_y') nograph kernel(gaus) `extras'
+				if `r(scale)' == . {
+					display as error "ERROR: density estimation failed. Please check variables provided, and/or provide a different step size for estimation"
+					error 321
+					exit
+				}
 		} 
 		else {
 			qui: kdensity `hh_income' if `touse' , gen(`temp_x' `temp_y') nograph kernel(gaus) `extras'
+				if `r(scale)' == . {
+					display as error "ERROR: density estimation failed. Please check variables provided, and/or provide a different step size for estimation"
+					error 321
+					exit
+				}
 		}
 		qui: replace `temp_y' = `temp_y'*`r(scale)'
 		qui: sum `temp_y'
@@ -307,12 +339,12 @@ program define kitli_compare2bm, sortpreserve
 					capture graph drop "detailed_`counter'"
 					line `temp_y_`group'' `temp_x_`group'', color(`this_color') recast(area) ///
 					ytitle("`ytitle'") `ticks_x' `ticks_y'  xlabel(, labsize(small)) note("`Note'") graphregion(color(white)) ///
-					legend(label( 1 "`group_label'") label(2 "Living Income Benchmark") label(3 "mean") label(4 "median"))  || ///
+					legend(label( 1 "`group_label'") label(2 "`label_benchmark'") label(3 "mean") label(4 "median"))  || ///
 					pci 0 `li_benchmark_`counter'' `h' `li_benchmark_`counter'', color(red) || ///
 					pci 0 `this_mean' `h' `this_mean', color(blue) || ///
 					pci 0 `this_median' `h' `this_median', color(green) ///
 					xtitle("`hh_income_label'") ///
-					text(`h' `li_benchmark_`counter'' "`share_li_`counter'' below the benchmark", place(right)) ///
+					text(`h' `li_benchmark_`counter'' "`share_li_`counter'' below the benchmark", place(`placement')) ///
 					name("detailed_`counter'")
 					
 					if "`save_graph_as'" != "" {
@@ -347,12 +379,12 @@ program define kitli_compare2bm, sortpreserve
 				capture graph drop "detailed_all_groups"
 				line `temp_y' `temp_x', color(`this_color') recast(area) ///
 				ytitle("`ytitle'") `ticks_x' `ticks_y'  xlabel(, labsize(small)) note("`Note'") graphregion(color(white)) ///
-				legend(label( 1 "All groups") label(2 "Living Income Benchmark") label(3 "mean") label(4 "median"))  || ///
+				legend(label( 1 "All groups") label(2 "`label_benchmark'") label(3 "mean") label(4 "median"))  || ///
 				pci 0 `li_benchmark_`counter'' `h' `li_benchmark_`counter'', color(red) || ///
 				pci 0 `this_mean' `h' `this_mean', color(blue) || ///
 				pci 0 `this_median' `h' `this_median', color(green) ///
 				xtitle("`hh_income_label'") ///
-				text(`h' `li_benchmark_`counter'' "`share_li_`counter'' below the benchmark", place(right)) ///
+				text(`h' `li_benchmark_`counter'' "`share_li_`counter'' below the benchmark", place(`placement')) ///
 				name("detailed_all_groups")
 				
 				if "`save_graph_as'" != "" {
@@ -386,12 +418,12 @@ program define kitli_compare2bm, sortpreserve
 				capture graph drop "detailed"
 				line `temp_y' `temp_x', color(`this_color') recast(area) ///
 				ytitle("`ytitle'") `ticks_x' `ticks_y'  xlabel(, labsize(small)) note("`Note'") graphregion(color(white)) ///
-				legend(label( 1 "All") label(2 "Living Income Benchmark") label(3 "mean") label(4 "median"))  || ///
+				legend(label( 1 "All") label(2 "`label_benchmark'") label(3 "mean") label(4 "median"))  || ///
 				pci 0 `li_benchmark_`counter'' `h' `li_benchmark_`counter'', color(red) || ///
 				pci 0 `this_mean' `h' `this_mean', color(blue) || ///
 				pci 0 `this_median' `h' `this_median', color(green) ///
 				xtitle("`hh_income_label'") ///
-				text(`h' `li_benchmark_`counter'' "`share_li_`counter'' below the benchmark", place(right)) ///
+				text(`h' `li_benchmark_`counter'' "`share_li_`counter'' below the benchmark", place(`placement')) ///
 				name("detailed")
 				
 				if "`save_graph_as'" != "" {
@@ -402,7 +434,7 @@ program define kitli_compare2bm, sortpreserve
 		}
 
 
-		if "`show_graph'" !="" | {
+		if "`show_distribution_graph'" !="" | {
 			** All together
 			** Decide on the heights, ordering by benchmark value:
 			if "`grouping_var'" !="" {
@@ -459,7 +491,7 @@ program define kitli_compare2bm, sortpreserve
 							gettoken this_color all_colors: all_colors, parse("|")
 						}
 						local group_bm_line = "`group_bm_line' || pci 0 `li_benchmark_`counter'' `h_`counter'' `li_benchmark_`counter'', color(`this_color')"
-						local group_bm_box = `"`group_bm_box' text(`h_`counter'' `li_benchmark_`counter'' "Living Income `group_label': `share_li_`counter'' below", size(small)  place(right) box margin(1 1 1 1) fcolor(`this_color'))"'
+						local group_bm_box = `"`group_bm_box' text(`h_`counter'' `li_benchmark_`counter'' "`label_benchmark' `group_label': `share_li_`counter'' below", size(small)  place(`placement') box margin(1 1 1 1) fcolor(`this_color'))"'
 					
 						local counter = `counter'+1
 				
@@ -470,7 +502,7 @@ program define kitli_compare2bm, sortpreserve
 			else {
 				gettoken this_color all_colors: all_colors, parse("|")
 				local group_bm_line = " || pci 0 `li_benchmark_1' `h_1' `li_benchmark_1', color(`this_color')"
-		        local group_bm_box = `" text(`h_1' `li_benchmark_1' "Living Income Benchmark: `share_li_1' below", size(small)  place(right) box margin(1 1 1 1) fcolor(`this_color'))"'
+		        local group_bm_box = `" text(`h_1' `li_benchmark_1' "`label_benchmark': `share_li_1' below", size(small)  place(`placement') box margin(1 1 1 1) fcolor(`this_color'))"'
 			}
 
 
@@ -486,7 +518,7 @@ program define kitli_compare2bm, sortpreserve
 
 			* save graph *
 			if "`save_graph_as'" != "" {
-				graph export "`save_graph_as'.png", as(png) width(1000) replace 
+				graph export "`save_graph_as' distribution.png", as(png) width(1000) replace 
 			}
 		}
 
@@ -520,12 +552,12 @@ program define kitli_compare2bm, sortpreserve
 		qui: gen `temp_bm_not_achieved_pct' = `temp_bm_not_achieved'*100
 
 		graph bar (mean)  `temp_bm_not_achieved_pct' if `touse'  `this_over' ///
-		stack legend(label(1 "Share of observations below the Living Income Benchmark")) ///
+		stack legend(label(1 "Share of observations below the `label_benchmark'")) ///
 		ytitle("`ytitle'") `this_ylabel' ///
 		bar(1, color("red")) ///
 		blabel(bar, format(%9.0f) position(center) ) ///
 		graphregion(color(white)) bgcolor(white) ///
-		title("Share of observations below the Living Income Benchmark") ///
+		title("Share of observations below the `label_benchmark'") ///
 		note(`Note_full')
 
 
@@ -535,13 +567,17 @@ program define kitli_compare2bm, sortpreserve
 
 
 	}
-	********************************************
-	* display table with results
+	***************************************************
+	* display table with results (and store in r-class)
+
+	local txt_spacing = 35
+	local txt_spacing = max(`txt_spacing', strlen("Below the `label_benchmark': "))
 
 	display in b _newline
-	display in b "Share of observations below the Living Income Benchmark" 
+	display in b "Share of observations below the `label_benchmark'" 
 
 	if "`grouping_var'" !="" { // show per group, than total
+		return local grouping_var = "`grouping_var'"
 
 		** per groups
 		foreach group in `group_levels' {
@@ -550,11 +586,13 @@ program define kitli_compare2bm, sortpreserve
 	
 			qui: sum `temp_bm_not_achieved' if `grouping_var' == `group' & `touse' 
 			local share_li = `r(mean)'*100
+			return scalar share_below_`group' = `share_li'
+			return scalar N_`group' = `r(N)'
 			display in b ""
 			display in b "`group_label'" 
 			display in b "n = `r(N)'"
 			display in b ""
-			display as text %35s "Below the Living Income Benchmark: " /*
+			display as text %`txt_spacing's "Below the `label_benchmark': " /*
 				*/ as result /*
 				*/ %9.1f `share_li' "%"
 			di as text "{hline 73}"
@@ -563,11 +601,13 @@ program define kitli_compare2bm, sortpreserve
 		** all groups together
 		qui: sum `temp_bm_not_achieved' if `grouping_var' != . & `touse' 
 		local share_li = `r(mean)'*100
+		return scalar share_below = `share_li'
+		return scalar N = `r(N)'
 		display in b ""
 		display in b "All groups"
 		display in b "n = `r(N)'"
 		display in b ""
-		display as text %35s "Below the Living Income Benchmark: " /*
+		display as text %`txt_spacing's "Below the `label_benchmark': " /*
 			*/ as result /*
 			*/ %9.1f `share_li' "%"
 		di as text "{hline 73}"
@@ -576,10 +616,12 @@ program define kitli_compare2bm, sortpreserve
 
 		qui: sum `temp_bm_not_achieved' if  `touse' 
 		local share_li = `r(mean)'*100
+		return scalar share_below = `share_li'
+		return scalar N = `r(N)'
 		display in b ""
 		display in b "n = `r(N)'"
 		display in b ""
-		display as text %35s "Below the Living Income Benchmark: " /*
+		display as text %`txt_spacing's "Below the `label_benchmark': " /*
 			*/ as result /*
 			*/ %9.1f `share_li' "%"
 		di as text "{hline 73}"

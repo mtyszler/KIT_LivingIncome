@@ -1,6 +1,6 @@
 {smcl}
-{* *! version 1.1  03jul2020}{...}
-{it: v1.1, 03jul2020}
+{* *! version 1.2  21jul2020}{...}
+{it: v1.2, 21jul2020}
 
 {title:Title}
 
@@ -43,8 +43,9 @@
 
 {synopt :{opth grouping_var:(varname)}} grouping variable {p_end}
 
-{syntab: Graph labels}
+{syntab: Labels}
 
+{synopt :{opt label_benchmark:(text)}} Text for benchmark name. Default "Living Income Benchmark" {p_end}
 {synopt :{opt label_currency:(text)}} Text for currency name. Default "USD" {p_end}
 {synopt :{opt label_time:(text)}} Text for time period name. Default "year" {p_end}
 {synopt :{opt label_hh_income:(text)}} Text for total income Default "Total income". Used if {opth main_income:(varname)} is NOT provided {p_end}
@@ -82,6 +83,9 @@
 {pstd} {browse "https://docs.wixstatic.com/ugd/0c5ab3_93560a9b816d40c3a28daaa686e972a5.pdf"}
 
 {pstd} It computes, optionally, the mean or median household income and breaks it down into main income, other income, gap to the living income benchmark. Optionally it includes the intrinsic value of food crops produced and consumed at home. Optionally, it computes the FGT index.
+
+{pstd} This function includes options to customize key elements of the graphs. 
+Please notice, however, that all graphs can be further edited using Stata's {help graph_editor} capabilities. 
 
 
 {title:Arguments}
@@ -150,7 +154,10 @@ above the benchmark line. {p_end}
 {opth grouping_var:(varname)} grouping variable. If specified, tables will be per group and bar charts will have one bar per group. {p_end}
 
 
-{dlgtab: Graph labels}
+{dlgtab: Labels}
+{pmore}
+{opth label_benchmark:(text)} Text for benchmark name. If not specified,  {it:Living Income Benchmark} is shown. {p_end}
+
 {pmore}
 {opth label_currency:(text)} Text for currency name. If not specified,  {it:USD} is shown. {p_end}
 
@@ -196,7 +203,7 @@ above the benchmark line. {p_end}
 {cmd:show_graph} shows graph comparing to the benchmark {p_end}
 
 {pmore}
-{opt save_graph_as:(text)} main stub of filename to be saved. Graphs will be saved as png format. {p_end}
+{opt save_graph_as:(text)} main stub of filename to be saved. Graphs will be saved as png format (appended to the filename). {p_end}
 
 
 
@@ -249,6 +256,30 @@ above the benchmark line. {p_end}
 ({stata "kitli_gap2bm benchmark, hh_income (total_hh_income_2018) main_income(total_cocoa_income_2018) food_value(food_value) grouping_var(grouping) show_graph":{it:click to run}}) 
 {p_end}
 
+{title:Saved results}
+
+{pstd}
+{cmd:kitli_gap2bm} saves the following in {cmd:r()}, depending on the options provided:
+
+{synoptset 20 tabbed}{...}
+{p2col 5 35 24 2: Scalars}{p_end}
+{pmore}
+{it: If groups are provided, the results names are appended with the group number} {p_end}
+
+{synopt:{cmd:r(N)}}number of observations{p_end}
+{synopt:{cmd:r(main_income)}} mean or median of the main income{p_end}
+{synopt:{cmd:r(other_than_main_income)}} mean or median of the other than main income{p_end}
+{synopt:{cmd:r(total_income)}} mean or median of the total income{p_end}
+{synopt:{cmd:r(food_value)}} mean or median of the intrinsic value of food produced and consumed at home{p_end}
+{synopt:{cmd:r(gap)}} mean or median of gap to the benchmark value{p_end}
+{synopt:{cmd:r(FGT)}} FGT index{p_end}
+{synopt:{cmd:r(benchmark)}} mean or median of the benchmark value{p_end}
+
+
+{p2col 5 20 24 2: Macros}{p_end}
+{synopt:{cmd:r(metric)}}metric calculated: mean, median of FGT{p_end}
+{synopt:{cmd:r(calculation)}}level or share{p_end}
+{synopt:{cmd:r(grouping_var)}}variable used for groupings{p_end}
 
 
 {title:Citation}
