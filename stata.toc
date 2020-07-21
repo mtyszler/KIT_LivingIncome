@@ -1,4 +1,4 @@
-v 1.1
+v 1.2
 d Marcelo Tyszler, PhD, KIT Royal Tropical Institute
 d
 d 'KIT_LIVINGINCOME': LIVING INCOME CALCULATIONS AND OUTPUTS: stata ado-file produces tables and charts of the Gap to the Living Income Benchmark
