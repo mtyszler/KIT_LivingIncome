@@ -22,6 +22,17 @@ Marcelo Tyszler. KIT Royal Tropical Institute, Netherlands. m.tyszler@kit.nl
 
 Carlos de los Rios. COSA. cd@thecosa.org
 
+#### Other Contributors
+
+Carlos de los Rios. COSA. cd@thecosa.org
+
+Elena Serfilippi. KIT Royal Tropical Institute, Netherlands.
+
+Esther Smits. KIT Royal Tropical Institute, Netherlands.
+
+Suchitra Yegna Narayan. Laudes Foundation
+
+
 ### Requirements
 
 * Stata version 13 
