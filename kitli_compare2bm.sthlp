@@ -174,17 +174,27 @@ Finally,  group graphs have the group label appended to the file name. {p_end}
 {phang}{cmd:. use https://raw.githubusercontent.com/mtyszler/KIT_LivingIncome/master/kitli_exampledata.dta}
 ({stata "use https://raw.githubusercontent.com/mtyszler/KIT_LivingIncome/master/kitli_exampledata.dta":{it:click to run}}) {p_end}
 
-{phang}Comparison plots for all
+{phang}Distribution plots for all
 
-{phang}{cmd:. kitli_compare2bm benchmark, hh_income(total_hh_income_2018) show_graph }
-({stata "kitli_compare2bm benchmark, hh_income(total_hh_income_2018) show_graph":{it:click to run}}) {p_end}
+{phang}{cmd:. kitli_compare2bm benchmark, hh_income(total_hh_income_2018) show_distribution_graph }
+({stata "kitli_compare2bm benchmark, hh_income(total_hh_income_2018) show_distribution_graph":{it:click to run}}) {p_end}
 
-{phang}Comparison plots for all, saving
+{phang}Distribution plots for all, saving
 
-{phang}{cmd:. kitli_compare2bm benchmark, hh_income(total_hh_income_2018) show_graph save_graph_as(example_density)} 
-({stata "kitli_compare2bm benchmark, hh_income(total_hh_income_2018) show_graph save_graph_as(example_density)":{it:click to run}}) {p_end}
+{phang}{cmd:. kitli_compare2bm benchmark, hh_income(total_hh_income_2018) show_distribution_graph save_graph_as(example_density)} 
+({stata "kitli_compare2bm benchmark, hh_income(total_hh_income_2018) show_distribution_graph save_graph_as(example_density)":{it:click to run}}) {p_end}
 
-{phang}Comparison plots, by group
+{phang}Distribution plots by groups
+
+{phang}{cmd:. kitli_compare2bm benchmark, hh_income(total_hh_income_2018) show_distribution_graph  grouping_var(grouping)  }
+({stata "kitli_compare2bm benchmark, hh_income(total_hh_income_2018) show_distribution_graph  grouping_var(grouping) ":{it:click to run}}) {p_end}
+
+{phang}Distribution plots by groups, with food value
+
+{phang}{cmd:. kitli_compare2bm benchmark, hh_income(total_hh_income_2018)  food_value(food_value) show_distribution_graph  grouping_var(grouping)  }
+({stata "kitli_compare2bm benchmark, hh_income(total_hh_income_2018)  food_value(food_value) show_distribution_graph  grouping_var(grouping) ":{it:click to run}}) {p_end}
+
+{phang}Detailed distribution plots, by group
 
 {phang}{cmd:. kitli_compare2bm benchmark, hh_income(total_hh_income_2018)  grouping_var(grouping) show_detailed_graph}
 ({stata "kitli_compare2bm benchmark, hh_income(total_hh_income_2018)  grouping_var(grouping) show_detailed_graph":{it:click to run}}) {p_end}
