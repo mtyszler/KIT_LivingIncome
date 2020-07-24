@@ -29,7 +29,7 @@ To view a copy of this license, visit http://creativecommons.org/licenses/by-sa/
 
 -----------------------------------------------------------------------------
 Last Update:
-21/07/2020
+24/07/2020
 
 *****************************************************************************/
 
@@ -39,7 +39,9 @@ program define kitli_compare2bm, sortpreserve rclass
 	syntax varname(numeric) [if] [in], ///
 	hh_income(varname numeric) ///
 	[grouping_var(varname numeric) ///
+	food_value(varname numeric) ///
 	label_benchmark(string) ///
+	label_food_value(string) /// 
 	ytitle(string) ///
 	spacing(real 0.02) ///
 	placement(string) ///
@@ -57,6 +59,10 @@ program define kitli_compare2bm, sortpreserve rclass
 	** Prepare observations which will be used 
 	marksample touse, novarlist
 	qui: replace `touse' = 0 if `varlist' == .
+	qui: replace `touse' = 0 if `hh_income' == .
+	if "`food_value'" !="" {
+		qui: replace `touse' = 0 if `food_value' == .
+	}
 
 
 	** color can only be provided if graph is requested:
@@ -70,11 +76,21 @@ program define kitli_compare2bm, sortpreserve rclass
 		display as error "WARNING: {it:save_graph_as} will be ignored if neither {it:show_distribution_graph} nor {it:show_detailed_graph}  nor {it:show_bar_graph} are requested."
 	}
 
+	* food value matching  matching elements
+	if "`label_food_value'" !="" & "`food_value'" == ""   {
+		display as error "WARNING: {it:label_food_value} will be ignored if {it:food_value} is not provided."
+	}
+
 
 	** load defaults in case optional arguments are skipped:
 	capture confirm existence `label_benchmark'	
 	if _rc == 6 {
 		local label_benchmark = "Living Income Benchmark"
+	}
+
+	capture confirm existence `label_food_value'
+	if _rc == 6 {
+		local label_food_value = "(including the value of food)"
 	}
 
 	capture confirm existence `colors'
@@ -111,12 +127,17 @@ program define kitli_compare2bm, sortpreserve rclass
 	local li_benchmark = "`varlist'" 	
 	
 	* key components
-	tempvar temp_bm_not_achieved 
+	tempvar temp_bm_not_achieved temp_hh_income
+	qui: gen `temp_hh_income' = `hh_income' if `touse'
+	if "`food_value'" !="" {
+		qui: replace `temp_hh_income' = `temp_hh_income' + `food_value' if `touse'
+	}
+
 	if "`grouping_var'" !="" {
-		qui: gen `temp_bm_not_achieved' =  `hh_income' < `li_benchmark' if `touse' & `grouping_var' !=. & `hh_income' !=. & `li_benchmark'!=.
+		qui: gen `temp_bm_not_achieved' =  `temp_hh_income' < `li_benchmark' if `touse' & `grouping_var' !=. & `temp_hh_income' !=. & `li_benchmark'!=.
 	} 
 	else {
-		qui: gen `temp_bm_not_achieved' =  `hh_income' < `li_benchmark' if `touse'	& `hh_income' !=. & `li_benchmark'!=.
+		qui: gen `temp_bm_not_achieved' =  `temp_hh_income' < `li_benchmark' if `touse'	& `temp_hh_income' !=. & `li_benchmark'!=.
 	}
 
 	* for kernels
@@ -126,10 +147,10 @@ program define kitli_compare2bm, sortpreserve rclass
   	********************************************
  	 * Identify groups:
 	if "`grouping_var'" !="" {
-		qui: sum `hh_income' if `touse' & `grouping_var' !=.
+		qui: sum `temp_hh_income' if `touse' & `grouping_var' !=.
 	} 
 	else {
-		qui: sum `hh_income' if `touse'
+		qui: sum `temp_hh_income' if `touse'
 	}
 
 	if `r(N)' == 0 {
@@ -143,6 +164,9 @@ program define kitli_compare2bm, sortpreserve rclass
 		local labels_cmd = `"label( 1 "All") "'
 
 		local hh_income_label: variable label `hh_income'
+		if "`food_value'" !="" {
+			local hh_income_label = `" "`hh_income_label'" "`label_food_value'" "'
+		}
 		
 		* Append group information:
 		if "`grouping_var'" !="" {
@@ -150,7 +174,7 @@ program define kitli_compare2bm, sortpreserve rclass
 			local cmd_order = "order (1 "
 			foreach group in `group_levels' {
 			
-				qui: sum `hh_income' if  `grouping_var' == `group' & `touse'
+				qui: sum `temp_hh_income' if  `grouping_var' == `group' & `touse'
 
 				local group_label: label (`grouping_var') `group'
 				
@@ -237,7 +261,7 @@ program define kitli_compare2bm, sortpreserve rclass
 				
 				capture drop temp_x_`group' temp_y_`group'	
 				capture tempvar temp_x_`group' temp_y_`group'
-				kdensity `hh_income' if `grouping_var' == `group' & `touse', gen(`temp_x_`group'' `temp_y_`group'') nograph kernel(gaus) `extras'
+				kdensity `temp_hh_income' if `grouping_var' == `group' & `touse', gen(`temp_x_`group'' `temp_y_`group'') nograph kernel(gaus) `extras'
 				if `r(scale)' == . {
 					display as error "ERROR: density estimation failed. Please check variables provided, and/or provide a different step size for estimation"
 					error 321
@@ -266,7 +290,7 @@ program define kitli_compare2bm, sortpreserve rclass
 		capture drop temp_x temp_y
 		capture tempvar temp_x temp_y
 		if "`grouping_var'" !="" {
-			kdensity `hh_income' if `touse' & `grouping_var' !=., gen(`temp_x' `temp_y') nograph kernel(gaus) `extras'
+			kdensity `temp_hh_income' if `touse' & `grouping_var' !=., gen(`temp_x' `temp_y') nograph kernel(gaus) `extras'
 				if `r(scale)' == . {
 					display as error "ERROR: density estimation failed. Please check variables provided, and/or provide a different step size for estimation"
 					error 321
@@ -274,7 +298,7 @@ program define kitli_compare2bm, sortpreserve rclass
 				}
 		} 
 		else {
-			qui: kdensity `hh_income' if `touse' , gen(`temp_x' `temp_y') nograph kernel(gaus) `extras'
+			qui: kdensity `temp_hh_income' if `touse' , gen(`temp_x' `temp_y') nograph kernel(gaus) `extras'
 				if `r(scale)' == . {
 					display as error "ERROR: density estimation failed. Please check variables provided, and/or provide a different step size for estimation"
 					error 321
@@ -316,7 +340,7 @@ program define kitli_compare2bm, sortpreserve rclass
 			local counter = 1
 			foreach group in `group_levels' {
 				local group_label: label (`grouping_var') `group'
-				qui: sum `hh_income' if  `grouping_var' == `group' & `touse', det
+				qui: sum `temp_hh_income' if  `grouping_var' == `group' & `touse', det
 				local Note = "N = `r(N)'"
 				local Note = "`Note', bin size = `w_2'"
 				local this_mean = `r(mean)'
@@ -343,7 +367,7 @@ program define kitli_compare2bm, sortpreserve rclass
 					pci 0 `li_benchmark_`counter'' `h' `li_benchmark_`counter'', color(red) || ///
 					pci 0 `this_mean' `h' `this_mean', color(blue) || ///
 					pci 0 `this_median' `h' `this_median', color(green) ///
-					xtitle("`hh_income_label'") ///
+					xtitle(`hh_income_label') ///
 					text(`h' `li_benchmark_`counter'' "`share_li_`counter'' below the benchmark", place(`placement')) ///
 					name("detailed_`counter'")
 					
@@ -356,7 +380,7 @@ program define kitli_compare2bm, sortpreserve rclass
 				local counter = `counter'+1
 			}
 
-			qui: sum `hh_income' if  `touse' & `grouping_var' !=. , det
+			qui: sum `temp_hh_income' if  `touse' & `grouping_var' !=. , det
 			local Note = "N = `r(N)'"
 			local Note = "`Note', bin size = `w_2'"
 			local this_mean = `r(mean)'
@@ -383,7 +407,7 @@ program define kitli_compare2bm, sortpreserve rclass
 				pci 0 `li_benchmark_`counter'' `h' `li_benchmark_`counter'', color(red) || ///
 				pci 0 `this_mean' `h' `this_mean', color(blue) || ///
 				pci 0 `this_median' `h' `this_median', color(green) ///
-				xtitle("`hh_income_label'") ///
+				xtitle(`hh_income_label') ///
 				text(`h' `li_benchmark_`counter'' "`share_li_`counter'' below the benchmark", place(`placement')) ///
 				name("detailed_all_groups")
 				
@@ -395,7 +419,7 @@ program define kitli_compare2bm, sortpreserve rclass
 		else {
 
 			local counter = 1
-			qui: sum `hh_income' if  `touse', det
+			qui: sum `temp_hh_income' if  `touse', det
 			local Note = "N = `r(N)'"
 			local Note = "`Note', bin size = `w_2'"
 			local this_mean = `r(mean)'
@@ -422,7 +446,7 @@ program define kitli_compare2bm, sortpreserve rclass
 				pci 0 `li_benchmark_`counter'' `h' `li_benchmark_`counter'', color(red) || ///
 				pci 0 `this_mean' `h' `this_mean', color(blue) || ///
 				pci 0 `this_median' `h' `this_median', color(green) ///
-				xtitle("`hh_income_label'") ///
+				xtitle(`hh_income_label') ///
 				text(`h' `li_benchmark_`counter'' "`share_li_`counter'' below the benchmark", place(`placement')) ///
 				name("detailed")
 				
@@ -508,7 +532,7 @@ program define kitli_compare2bm, sortpreserve rclass
 
 			capture graph drop "all_combined"
 			line `temp_y' `temp_x',   /// 
-			ytitle("`ytitle'") `ticks_x' `ticks_y'  xtitle("`hh_income_label'") ///
+			ytitle("`ytitle'") `ticks_x' `ticks_y'  xtitle(`hh_income_label') ///
 			xlabel(, labsize(small)) note(`Note_full') graphregion(color(white)) ///
 			legend(`labels_cmd') ///
 			`group_graph' ///
@@ -536,7 +560,7 @@ program define kitli_compare2bm, sortpreserve rclass
 			if "`grouping_var'" !="" {
 
 				foreach group in `group_levels' {
-					qui: sum `hh_income' if  `grouping_var' == `group' & `touse'
+					qui: sum `temp_hh_income' if  `grouping_var' == `group' & `touse'
 					local group_label: label (`grouping_var') `group'
 					local Note_full= `"`Note_full' "N (`group_label') = `r(N)'""'				
 				}
@@ -544,12 +568,18 @@ program define kitli_compare2bm, sortpreserve rclass
 		}
 		else {
 			local this_over = ", "
-			qui: sum `hh_income' if `touse'
+			qui: sum `temp_hh_income' if `touse'
 			local Note_full = `""N = `r(N)'""'
 		}
 
 		tempvar temp_bm_not_achieved_pct
 		qui: gen `temp_bm_not_achieved_pct' = `temp_bm_not_achieved'*100
+
+		local this_title = "Share of observations below the `label_benchmark'"
+		if "`food_value'" !="" {
+			local this_title = `" "`this_title'" "`label_food_value'" "'
+		}
+
 
 		graph bar (mean)  `temp_bm_not_achieved_pct' if `touse'  `this_over' ///
 		stack legend(label(1 "Share of observations below the `label_benchmark'")) ///
@@ -557,7 +587,7 @@ program define kitli_compare2bm, sortpreserve rclass
 		bar(1, color("red")) ///
 		blabel(bar, format(%9.0f) position(center) ) ///
 		graphregion(color(white)) bgcolor(white) ///
-		title("Share of observations below the `label_benchmark'") ///
+		title(`this_title', size(medium)) ///
 		note(`Note_full')
 
 
@@ -575,6 +605,9 @@ program define kitli_compare2bm, sortpreserve rclass
 
 	display in b _newline
 	display in b "Share of observations below the `label_benchmark'" 
+	if "`food_value'" !="" {
+		display in b "`label_food_value'"
+	}
 
 	if "`grouping_var'" !="" { // show per group, than total
 		return local grouping_var = "`grouping_var'"

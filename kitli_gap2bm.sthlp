@@ -1,6 +1,6 @@
 {smcl}
-{* *! version 1.2  21jul2020}{...}
-{it: v1.2, 21jul2020}
+{* *! version 1.3  24jul2020}{...}
+{it: v1.3, 24jul2020}
 
 {title:Title}
 
@@ -82,7 +82,9 @@
 
 {pstd} {browse "https://docs.wixstatic.com/ugd/0c5ab3_93560a9b816d40c3a28daaa686e972a5.pdf"}
 
-{pstd} It computes, optionally, the mean or median household income and breaks it down into main income, other income, gap to the living income benchmark. Optionally it includes the intrinsic value of food crops produced and consumed at home. Optionally, it computes the FGT index.
+{pstd} It computes, optionally, the mean or median household income and breaks it down into main income, other income, 
+gap to the living income benchmark. Optionally it includes the intrinsic value of food crops produced and consumed at home. 
+Optionally, it computes the FGT index.
 
 {pstd} This function includes options to customize key elements of the graphs. 
 Please notice, however, that all graphs can be further edited using Stata's {help graph_editor} capabilities. 
@@ -111,12 +113,14 @@ but excluding intrinsic value of food produced at home.
 {pmore}
 
 {pmore}
-{opth main_income:(varname)} {varname} of total income from main source, for example main crop sales. If provided, the outputs assume there is one main income source. The calculations are done  only for complete observations, i.e., if 
+{opth main_income:(varname)} {varname} of total income from main source, for example main crop sales. If provided, the outputs assume there is one main income source.
+ The calculations are done  only for complete observations, i.e., if 
 {opth main_income:(varname)} is provided, observations
 where {opth main_income:(varname)} is missing will be excluded from the calculations. 
 
 {pmore}
-{opth food_value:(varname)} {varname} of the value of food produced and consumed at home. If provided, it is added to the total income. The calculations are done only for complete observations, i.e., if {opth food_value:(varname)} is provided, 
+{opth food_value:(varname)} {varname} of the value of food produced and consumed at home. If provided, it is added to the total income. 
+The calculations are done only for complete observations, i.e., if {opth food_value:(varname)} is provided, 
 observations where
 {opth food_value:(varname)} is missing will be excluded from the calculations. 
 If provided, it will be added to the {opth hh_income:(varname)}

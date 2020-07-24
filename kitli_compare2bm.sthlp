@@ -1,6 +1,6 @@
 {smcl}
-{* *! version 1.2  21jul2020}{...}
-{it: v1.2, 21jul2020}
+{* *! version 1.3  24jul2020}{...}
+{it: v1.3, 24jul2020}
 
 {title:Title}
 
@@ -25,6 +25,10 @@ the total household income with the goal of comparing to the benchmark value, op
 {synopthdr:optional arguments}
 {synoptline}
 
+{syntab: Income composition}
+
+{synopt :{opth food_value:(varname)}} {varname} of value attributable to food produced and consumed at home {p_end}
+
 {syntab: Grouping}
 
 {synopt :{opth grouping_var:(varname)}} grouping variable {p_end}
@@ -32,6 +36,8 @@ the total household income with the goal of comparing to the benchmark value, op
 {syntab: Labels}
 
 {synopt :{opt label_benchmark:(text)}} Text for benchmark name. Default "Living Income Benchmark" {p_end}
+{synopt :{opt label_food_value:(text)}} Text for value of food. Default "(including the value of food)" added to the label of {opth hh_income:(varname)}.
+Used if {opth food_value:(varname)} is provided {p_end}
 
 {syntab: Graph options}
 
@@ -57,7 +63,8 @@ comparing to the benchmark, including mean and median values  {p_end}
 
 {pstd}
 {cmd: kitli_compare2bm} produces tables, bar charts and density ({help kdensity:kernel smoothened}) plots as fractions about the distribution of 
-total household income with the goal of comparing to the benchmark value. If a grouping variable is used, it creates, optionally, 
+total household income with the goal of comparing to the benchmark value. Optionally it includes the intrinsic value of food crops produced and consumed at home. 
+If a grouping variable is used, it creates, optionally, 
 a detailed graph per group and a combined graph.
 
 {pstd} It produces graphs similar to what can be seen at:
@@ -88,6 +95,18 @@ Please notice, however, that all graphs can be further edited using Stata's {hel
 {pmore}{it:{cmd:li_benchmark} and {opth hh_income:(varname)} need to be in the same currency and unit (e.g., USD per household).}
 {p_end}
 
+{dlgtab:Income composition}
+{pmore}
+
+{pmore}
+{opth food_value:(varname)} {varname} of the value of food produced and consumed at home. If provided, it is added to the total income. 
+The calculations are done only for complete observations, i.e., if {opth food_value:(varname)} is provided, 
+observations where
+{opth food_value:(varname)} is missing will be excluded from the calculations. 
+If provided, it will be added to the {opth hh_income:(varname)}
+
+{pmore}{it: {opth food_value:(varname)} needs to be in the same currency and unit as {it:{cmd:li_benchmark}} (e.g., USD per household).}
+{p_end}
 
 {dlgtab:Grouping}
 {pmore}
@@ -96,6 +115,10 @@ Please notice, however, that all graphs can be further edited using Stata's {hel
 {dlgtab: Labels}
 {pmore}
 {opth label_benchmark:(text)} Text for benchmark name. If not specified,  {it:Living Income Benchmark} is shown. {p_end}
+
+{pmore}
+{opth label_food_value:(text)} Text for intrinsic value of food. If not specified,  {it:(including the value of food)} is added to the label of {opth hh_income:(varname)}.
+Only in case {it:food_value} is provided. {p_end}
 
 {dlgtab: Graph options}
 
@@ -151,20 +174,45 @@ Finally,  group graphs have the group label appended to the file name. {p_end}
 {phang}{cmd:. use https://raw.githubusercontent.com/mtyszler/KIT_LivingIncome/master/kitli_exampledata.dta}
 ({stata "use https://raw.githubusercontent.com/mtyszler/KIT_LivingIncome/master/kitli_exampledata.dta":{it:click to run}}) {p_end}
 
-{phang}Comparison plots for all
+{phang}Distribution plots for all
 
-{phang}{cmd:. kitli_compare2bm benchmark, hh_income(total_hh_income_2018) show_graph }
-({stata "kitli_compare2bm benchmark, hh_income(total_hh_income_2018) show_graph":{it:click to run}}) {p_end}
+{phang}{cmd:. kitli_compare2bm benchmark, hh_income(total_hh_income_2018) show_distribution_graph }
+({stata "kitli_compare2bm benchmark, hh_income(total_hh_income_2018) show_distribution_graph":{it:click to run}}) {p_end}
 
-{phang}Comparison plots for all, saving
+{phang}Distribution plots for all, saving
 
-{phang}{cmd:. kitli_compare2bm benchmark, hh_income(total_hh_income_2018) show_graph save_graph_as(example_density)} 
-({stata "kitli_compare2bm benchmark, hh_income(total_hh_income_2018) show_graph save_graph_as(example_density)":{it:click to run}}) {p_end}
+{phang}{cmd:. kitli_compare2bm benchmark, hh_income(total_hh_income_2018) show_distribution_graph save_graph_as(example_density)} 
+({stata "kitli_compare2bm benchmark, hh_income(total_hh_income_2018) show_distribution_graph save_graph_as(example_density)":{it:click to run}}) {p_end}
 
-{phang}Comparison plots, by group
+{phang}Distribution plots by groups
+
+{phang}{cmd:. kitli_compare2bm benchmark, hh_income(total_hh_income_2018) show_distribution_graph  grouping_var(grouping)  }
+({stata "kitli_compare2bm benchmark, hh_income(total_hh_income_2018) show_distribution_graph  grouping_var(grouping) ":{it:click to run}}) {p_end}
+
+{phang}Distribution plots by groups, with food value
+
+{phang}{cmd:. kitli_compare2bm benchmark, hh_income(total_hh_income_2018)  food_value(food_value) show_distribution_graph  grouping_var(grouping)  }
+({stata "kitli_compare2bm benchmark, hh_income(total_hh_income_2018)  food_value(food_value) show_distribution_graph  grouping_var(grouping) ":{it:click to run}}) {p_end}
+
+{phang}Detailed distribution plots, by group
 
 {phang}{cmd:. kitli_compare2bm benchmark, hh_income(total_hh_income_2018)  grouping_var(grouping) show_detailed_graph}
 ({stata "kitli_compare2bm benchmark, hh_income(total_hh_income_2018)  grouping_var(grouping) show_detailed_graph":{it:click to run}}) {p_end}
+
+{phang}Detailed distribution plots, by group, with food value
+
+{phang}{cmd:. kitli_compare2bm benchmark, hh_income(total_hh_income_2018)   food_value(food_value) grouping_var(grouping) show_detailed_graph}
+({stata "kitli_compare2bm benchmark, hh_income(total_hh_income_2018)  food_value(food_value) grouping_var(grouping) show_detailed_graph":{it:click to run}}) {p_end}
+
+{phang}Bar graph by groups
+
+{phang}{cmd:. kitli_compare2bm benchmark, hh_income(total_hh_income_2018) show_bar_graph  grouping_var(grouping)  }
+({stata "kitli_compare2bm benchmark, hh_income(total_hh_income_2018) show_bar_graph  grouping_var(grouping) ":{it:click to run}}) {p_end}
+
+{phang}Bar graph by groups, with food value
+ 
+{phang}{cmd:. kitli_compare2bm benchmark, hh_income(total_hh_income_2018) food_value(food_value) show_bar_graph  grouping_var(grouping)  }
+({stata "kitli_compare2bm benchmark, hh_income(total_hh_income_2018) food_value(food_value) show_bar_graph  grouping_var(grouping) ":{it:click to run}}) {p_end}
 
 {title:Saved results}
 

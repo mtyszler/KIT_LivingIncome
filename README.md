@@ -2,7 +2,7 @@
 [![License: CC BY-SA 4.0](https://img.shields.io/badge/License-CC%20BY--SA%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by-sa/4.0/)
 
 ## Developed by [KIT](http://www.kit.nl) and [COSA](http://thecosa.org/)
-[Last update 21/7/2020] 
+[Last update 24/7/2020] 
 
 `kit_livingincome` provides stata ado-files to produce tables and charts of the Gap to the Living Income Benchmark.
  
@@ -85,13 +85,13 @@ or
 help kitli_compare2bm
 ```
 
-And take notice of the version and date at the top. The latest version is _v1.2, 21jul2020_
+And take notice of the version and date at the top. The latest version is _v1.3, 24jul2020_
 
 ## Citation
 
 Please cite the package as follows:
 
-> Tyszler, et al. (2019). Living Income Calculations Toolbox. KIT ROYAL TROPICAL 
+> Tyszler, et al. (2020). Living Income Calculations Toolbox. KIT ROYAL TROPICAL 
 INSTITUTE and COSA. Available at: https://github.com/mtyszler/KIT_LivingIncome/
 
 ## License
