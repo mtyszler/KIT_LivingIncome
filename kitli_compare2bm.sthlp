@@ -209,6 +209,11 @@ Finally,  group graphs have the group label appended to the file name. {p_end}
 {phang}{cmd:. kitli_compare2bm benchmark, hh_income(total_hh_income_2018) show_bar_graph  grouping_var(grouping)  }
 ({stata "kitli_compare2bm benchmark, hh_income(total_hh_income_2018) show_bar_graph  grouping_var(grouping) ":{it:click to run}}) {p_end}
 
+{phang}Bar graph by groups, with food value
+ 
+{phang}{cmd:. kitli_compare2bm benchmark, hh_income(total_hh_income_2018) food_value(food_value) show_bar_graph  grouping_var(grouping)  }
+({stata "kitli_compare2bm benchmark, hh_income(total_hh_income_2018) food_value(food_value) show_bar_graph  grouping_var(grouping) ":{it:click to run}}) {p_end}
+
 {title:Saved results}
 
 {pstd}
