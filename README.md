@@ -36,6 +36,11 @@ Suchitra Yegna Narayan. Laudes Foundation
 * Stata version 13 
 
 ## Installing `kit_livingincome`
+To install directly from the [SSC archive](https://econpapers.repec.org/software/bocbocode/S458819.htm), type:
+```
+ssc install kit_livingincome
+```
+
 
 To install the latest development version directly from Github using stata `github` package, type: 
 ```
