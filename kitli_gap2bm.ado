@@ -168,23 +168,48 @@ program define kitli_gap2bm, sortpreserve rclass
 	}
 	capture confirm existence `color_hh_income'
 	if _rc == 6 {
-		local color_hh_income = "blue%30"
+		if `c(stata_version)' < 15 {
+			local color_hh_income = "blue"
+		}
+		else {
+			local color_hh_income = "blue%30"	
+		}
 	}
 	capture confirm existence `color_main_income'
 	if _rc == 6 {
-		local color_main_income = "blue%30"
+		if `c(stata_version)' < 15 {
+			local color_main_income = "blue"
+		}
+		else {
+			local color_main_income = "blue%30"	
+		}
 	}
 	capture confirm existence `color_other_than_main_income'
 	if _rc == 6 {
-		local color_other_than_main_income = "ebblue%30"
+		if `c(stata_version)' < 15 {
+			local color_other_than_main_income = "ebblue"
+		}
+		else {
+			local color_main_income = "ebblue%30"	
+		}
 	}
 	capture confirm existence `color_gap'
 	if _rc == 6 {
-		local color_gap = "red%80"
+		if `c(stata_version)' < 15 {
+			local color_other_than_main_income = "red"
+		}
+		else {
+			local color_main_income = "red%80"	
+		}
 	}
 	capture confirm existence `color_food_value'
 	if _rc == 6 {
-		local color_food_value = "orange%30"
+		if `c(stata_version)' < 15 {
+			local color_other_than_main_income = "orange"
+		}
+		else {
+			local color_main_income = "orange%30"	
+		}
 	}
 
 

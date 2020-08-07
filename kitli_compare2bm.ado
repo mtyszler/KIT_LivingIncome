@@ -95,7 +95,12 @@ program define kitli_compare2bm, sortpreserve rclass
 
 	capture confirm existence `colors'
 	if _rc == 6 {
-		local colors = "ebblue%30 | blue%30 | green%30 | orange%30"
+		if `c(stata_version)' < 15 {
+			local colors = "ebblue | blue | green | orange"	
+		}
+		else {
+			local colors = "ebblue%30 | blue%30 | green%30 | orange%30"
+		}
 	}
 
 	capture confirm existence `ytitle'
