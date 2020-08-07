@@ -16,6 +16,11 @@ A detailed Guidance Manual can be found at:
 
 https://www.living-income.com/papersandreports
 
+or directly at:
+
+https://eur03.safelinks.protection.outlook.com/?url=https%3A%2F%2F0c5ab38c-aabb-4d3d-84e9-056ccebab450.usrfiles.com%2Fugd%2F0c5ab3_74a43f3647724bc58caf4daaa570482b.pdf&data=02%7C01%7Cm.tyszler%40kit.nl%7Cf199ee7ce9bd423b54ff08d838827f5f%7C99193bd4318d47c6a89624e15f7a7e1b%7C1%7C1%7C637321480450701968&sdata=HkxU0DQng8cl3PW%2B6oL7NK%2BuHGcQQzhtpKXT5UMAhZE%3D&reserved=0
+
+
 ### Authors
 
 Marcelo Tyszler. KIT Royal Tropical Institute, Netherlands. m.tyszler@kit.nl
