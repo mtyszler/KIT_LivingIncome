@@ -33,7 +33,6 @@ Last Update:
 
 *****************************************************************************/
 
-version 13 
 capture program drop kitli_compare2bm
 program define kitli_compare2bm, sortpreserve rclass
 	syntax varname(numeric) [if] [in], ///
@@ -53,6 +52,7 @@ program define kitli_compare2bm, sortpreserve rclass
 	save_graph_as(string) ///
 	]
 	
+	version 14 
 
 
 	********************************************

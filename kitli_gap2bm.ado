@@ -34,7 +34,6 @@ Last Update:
 
 *****************************************************************************/
 
-version 13 
 capture program drop kitli_gap2bm
 program define kitli_gap2bm, sortpreserve rclass
 	syntax varname(numeric) [if] [in], ///
@@ -59,6 +58,8 @@ program define kitli_gap2bm, sortpreserve rclass
 	save_graph_as(string) ///
 	as_share ///
 	]
+
+	version 14
 	
 	
 
