@@ -1,6 +1,6 @@
 {smcl}
-{* *! version 1.3  24jul2020}{...}
-{it: v1.3, 24jul2020}
+{* *! version 1.4  07aug2020}{...}
+{it: v1.4, 07aug2020}
 
 {title:Title}
 
@@ -56,11 +56,16 @@
 
 {syntab: Graph colors}
 
-{synopt :{opth color_hh_income:(colorstyle)}} Color of total income. Default "blue%30". Used if {opth main_income:(varname)} is NOT provided {p_end}
-{synopt :{opth color_main_income:(colorstyle)}} Color of main source of income. Default "blue%30". Used if {opth main_income:(varname)} is provided{p_end}
-{synopt :{opth color_other_than_main_income:(colorstyle)}} Color of remaining income. Default "ebblue%30". Used if {opth main_income:(varname)} is provided {p_end}
-{synopt :{opth color_food_value:(colorstyle)}} Color of the intrinsic value of food consumed at home. Default "orange%30". Used if {opth food_value:(varname)} is provided {p_end}
-{synopt :{opth color_gap:(colorstyle)}} Color of the gap to the living income benchmark. Default "red%30" {p_end}
+{synopt :{opth color_hh_income:(colorstyle)}} Color of total income. Default "blue%30"
+(or "blue" if older than stata 15). Used if {opth main_income:(varname)} is NOT provided {p_end}
+{synopt :{opth color_main_income:(colorstyle)}} Color of main source of income. Default "blue%30" 
+(or "blue" if older than stata 15). Used if {opth main_income:(varname)} is provided{p_end}
+{synopt :{opth color_other_than_main_income:(colorstyle)}} Color of remaining income. Default "ebblue%30" (or "ebblue" if older than stata 15)
+. Used if {opth main_income:(varname)} is provided {p_end}
+{synopt :{opth color_food_value:(colorstyle)}} Color of the intrinsic value of food consumed at home. Default "orange%30" (or
+ "orange" if older than stata 15). Used if {opth food_value:(varname)} is provided {p_end}
+{synopt :{opth color_gap:(colorstyle)}} Color of the gap to the living income benchmark. Default "red%30" (or "red"
+ if older than stata 15) {p_end}
 
 
 {syntab: Graph exporting}
@@ -182,7 +187,9 @@ above the benchmark line. {p_end}
 
 
 {dlgtab: Graph colors}
-{pmore}{it:For more information see {help colorstyle}}
+{pmore}{it:For more information see {help colorstyle}}. Please notice that transparency in colors ("%30")
+is only available from stata version 15 onwards. If stata version is older than 15
+the default values will skip the transparency.
 
 {pmore}
 {opth color_hh_income:(colorstyle)} Color of main source of income. Default "blue%30".  {p_end}

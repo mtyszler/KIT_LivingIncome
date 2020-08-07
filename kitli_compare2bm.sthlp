@@ -1,6 +1,6 @@
 {smcl}
-{* *! version 1.3  24jul2020}{...}
-{it: v1.3, 24jul2020}
+{* *! version 1.4  07aug2020}{...}
+{it: v1.4, 07aug2020}
 
 {title:Title}
 
@@ -45,7 +45,8 @@ Used if {opth food_value:(varname)} is provided {p_end}
 {synopt :{opt spacing:(number)}} Value for spacing between the boxes of the combined graph of all groups. Defaults to 0.02 {p_end}
 {synopt :{opt placement:(text)}} Placement of the boxes of the indicating the share of those below the benchmark. Defaults to {it:right}. {p_end}
 {synopt :{opt step_size:(integer)}} Value for step size in the x-axis. Defaults to a value calculated internally {p_end}
-{synopt :{opt colors:(text)}} String with colors for the graph. Default "ebblue%30 | blue%30 | green%30 | orange%30" {p_end}
+{synopt :{opt colors:(text)}} String with colors for the graph. Default "ebblue%30 | blue%30 | green%30 | orange%30" 
+if stata 15 or newer and "ebblue | blue | green | orange" otherwise  {p_end}
 
 {syntab: Graph exporting}
 
@@ -140,7 +141,11 @@ Because the internal calculation might not suit all ranges of values,
 the user can choose to override its value {p_end}
 
 {pmore}
-{opt colors:(text)} Colors for the curves. Multiple colors need to be separated by a "|".  Default "ebblue%30 | blue%30 | green%30 | orange%30".  {p_end}
+{opt colors:(text)} Colors for the curves. Multiple colors need to be separated by a "|".  
+Default "ebblue%30 | blue%30 | green%30 | orange%30" if stata 15 or newer and  
+"ebblue | blue | green | orange" otherwise. Please notice that 
+transparency in colors ("%30") is only 
+available from stata version 15 onwards.  {p_end}
 
 {pmore}{it:For more information see {help colorstyle}}
 

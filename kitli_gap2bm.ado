@@ -30,11 +30,10 @@ To view a copy of this license, visit http://creativecommons.org/licenses/by-sa/
 
 -----------------------------------------------------------------------------
 Last Update:
-24/07/2020
+07/08/2020
 
 *****************************************************************************/
 
-version 13 
 capture program drop kitli_gap2bm
 program define kitli_gap2bm, sortpreserve rclass
 	syntax varname(numeric) [if] [in], ///
@@ -59,6 +58,8 @@ program define kitli_gap2bm, sortpreserve rclass
 	save_graph_as(string) ///
 	as_share ///
 	]
+
+	version 14
 	
 	
 
@@ -167,23 +168,48 @@ program define kitli_gap2bm, sortpreserve rclass
 	}
 	capture confirm existence `color_hh_income'
 	if _rc == 6 {
-		local color_hh_income = "blue%30"
+		if `c(stata_version)' < 15 {
+			local color_hh_income = "blue"
+		}
+		else {
+			local color_hh_income = "blue%30"	
+		}
 	}
 	capture confirm existence `color_main_income'
 	if _rc == 6 {
-		local color_main_income = "blue%30"
+		if `c(stata_version)' < 15 {
+			local color_main_income = "blue"
+		}
+		else {
+			local color_main_income = "blue%30"	
+		}
 	}
 	capture confirm existence `color_other_than_main_income'
 	if _rc == 6 {
-		local color_other_than_main_income = "ebblue%30"
+		if `c(stata_version)' < 15 {
+			local color_other_than_main_income = "ebblue"
+		}
+		else {
+			local color_other_than_main_income = "ebblue%30"	
+		}
 	}
 	capture confirm existence `color_gap'
 	if _rc == 6 {
-		local color_gap = "red%80"
+		if `c(stata_version)' < 15 {
+			local color_gap = "red"
+		}
+		else {
+			local color_gap = "red%80"	
+		}
 	}
 	capture confirm existence `color_food_value'
 	if _rc == 6 {
-		local color_food_value = "orange%30"
+		if `c(stata_version)' < 15 {
+			local color_food_value = "orange"
+		}
+		else {
+			local color_food_value = "orange%30"	
+		}
 	}
 
 
