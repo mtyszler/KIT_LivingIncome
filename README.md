@@ -2,7 +2,7 @@
 [![License: CC BY-SA 4.0](https://img.shields.io/badge/License-CC%20BY--SA%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by-sa/4.0/)
 
 ## Developed by [KIT](http://www.kit.nl) and [COSA](http://thecosa.org/)
-[Last update 24/7/2020] 
+[Last update 07/08/2020] 
 
 `kit_livingincome` provides stata ado-files to produce tables and charts of the Gap to the Living Income Benchmark.
  
@@ -33,7 +33,7 @@ Suchitra Yegna Narayan. Laudes Foundation
 
 ### Requirements
 
-* Stata version 13 
+* Stata version 14 
 
 ## Installing `kit_livingincome`
 To install directly from the [SSC archive](https://econpapers.repec.org/software/bocbocode/S458819.htm), type:
@@ -90,7 +90,7 @@ or
 help kitli_compare2bm
 ```
 
-And take notice of the version and date at the top. The latest version is _v1.3, 24jul2020_
+And take notice of the version and date at the top. The latest version is _v1.4, 07aug2020_
 
 ## Citation
 
