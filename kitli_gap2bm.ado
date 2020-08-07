@@ -190,25 +190,25 @@ program define kitli_gap2bm, sortpreserve rclass
 			local color_other_than_main_income = "ebblue"
 		}
 		else {
-			local color_main_income = "ebblue%30"	
+			local color_other_than_main_income = "ebblue%30"	
 		}
 	}
 	capture confirm existence `color_gap'
 	if _rc == 6 {
 		if `c(stata_version)' < 15 {
-			local color_other_than_main_income = "red"
+			local color_gap = "red"
 		}
 		else {
-			local color_main_income = "red%80"	
+			local color_gap = "red%80"	
 		}
 	}
 	capture confirm existence `color_food_value'
 	if _rc == 6 {
 		if `c(stata_version)' < 15 {
-			local color_other_than_main_income = "orange"
+			local color_food_value = "orange"
 		}
 		else {
-			local color_main_income = "orange%30"	
+			local color_food_value = "orange%30"	
 		}
 	}
 
